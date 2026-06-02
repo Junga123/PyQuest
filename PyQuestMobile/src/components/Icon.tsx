@@ -1,5 +1,16 @@
 import React from 'react';
-import { View } from 'react-native';
+import { Image, View } from 'react-native';
+import { TAB_BOOK, TAB_CHART, TAB_MEDAL, TAB_PERSON } from '../data/assets';
+
+// Иконки табов — растровые силуэты (PNG), тинтуются цветом. Рендерятся
+// пиксель-в-пиксель на всех устройствах и эмуляторах (включая BlueStacks),
+// где View-иконки с тонкими рамками/поворотами давали артефакты.
+const IMAGE_ICONS: Partial<Record<string, string>> = {
+  book: TAB_BOOK,
+  chart: TAB_CHART,
+  medal: TAB_MEDAL,
+  person: TAB_PERSON,
+};
 
 // Векторные иконки, нарисованные из View-примитивов — без эмодзи и без нативных
 // зависимостей (react-native-vector-icons). Гарантированно рендерятся одинаково
@@ -29,6 +40,11 @@ export const Icon: React.FC<Props> = ({ name, size = 24, color = '#fff' }) => {
   const s = size;
   const box = { width: s, height: s, alignItems: 'center' as const, justifyContent: 'center' as const };
   const stroke = Math.max(2, Math.round(s * 0.09));
+
+  const img = IMAGE_ICONS[name];
+  if (img) {
+    return <Image source={{ uri: img }} style={{ width: s, height: s, tintColor: color }} resizeMode="contain" />;
+  }
 
   switch (name) {
     case 'book':

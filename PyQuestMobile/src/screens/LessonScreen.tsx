@@ -6,6 +6,8 @@ import { Palette, radius, spacing } from '../theme/theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeContext';
 import { Button, Card, CodeBlock, Pill } from '../components/UI';
 import { CodeEditor } from '../components/CodeEditor';
+import { Hero } from '../components/Hero';
+import { FadeInView } from '../components/Anim';
 import { Icon } from '../components/Icon';
 import { CoursesStackParamList } from '../navigation/types';
 import { CodeValidation, FillGapValidation, Lesson, MultipleChoiceValidation, Task } from '../types';
@@ -86,12 +88,21 @@ export const LessonScreen: React.FC = () => {
 
   if (phase === 'done') {
     return (
-      <View style={styles.center}>
-        <Text style={styles.bigEmoji}>🎉</Text>
-        <Text style={styles.h1}>Урок пройден!</Text>
-        <Text style={styles.lead}>Вы заработали в этой сессии</Text>
-        <Text style={styles.xpBig}>+{earned} XP</Text>
-        <Button title="Вернуться к карте" onPress={() => navigation.goBack()} style={{ marginTop: spacing.xl, alignSelf: 'stretch' }} />
+      <View style={styles.doneWrap}>
+        <FadeInView offset={20}>
+          <Hero style={styles.doneHero}>
+            <View style={styles.doneInner}>
+              <Text style={styles.bigEmoji}>🎉</Text>
+              <Text style={styles.doneTitle}>Урок пройден!</Text>
+              <Text style={styles.doneSub}>Отличная работа. Вы заработали</Text>
+              <Text style={styles.xpBig}>+{earned} XP</Text>
+              <View style={styles.confetti}>
+                <Text style={styles.confettiText}>⭐  🐍  ✨  🏆  ✨</Text>
+              </View>
+            </View>
+          </Hero>
+          <Button title="Вернуться к карте" variant="accent" onPress={() => navigation.goBack()} style={{ marginTop: spacing.xl }} />
+        </FadeInView>
       </View>
     );
   }
@@ -304,8 +315,15 @@ const makeStyles = (c: Palette) =>
     hint: { color: c.textMuted, fontSize: 14, marginTop: spacing.sm, fontStyle: 'italic', lineHeight: 21 },
     feedback: { borderRadius: radius.md, padding: spacing.md, marginTop: spacing.lg },
     feedbackText: { fontSize: 14, fontWeight: '600', lineHeight: 20 },
-    bigEmoji: { fontSize: 64, marginBottom: spacing.md },
-    xpBig: { color: c.accent, fontSize: 40, fontWeight: '900', marginTop: spacing.sm },
+    doneWrap: { flex: 1, backgroundColor: c.bg, justifyContent: 'center', padding: spacing.lg },
+    doneHero: {},
+    doneInner: { padding: spacing.xl, alignItems: 'center' },
+    doneTitle: { color: '#fff', fontSize: 26, fontWeight: '900', marginTop: spacing.sm },
+    doneSub: { color: 'rgba(255,255,255,0.85)', fontSize: 14, marginTop: spacing.sm },
+    confetti: { marginTop: spacing.lg },
+    confettiText: { fontSize: 22, letterSpacing: 2 },
+    bigEmoji: { fontSize: 64 },
+    xpBig: { color: '#FFD43B', fontSize: 44, fontWeight: '900', marginTop: spacing.sm },
     // вспомогательные «цветовые» стили для Pill
     _accent: { color: c.primaryLight },
     _accentBg: { backgroundColor: c.primary + '22' },

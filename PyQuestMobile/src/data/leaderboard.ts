@@ -3,10 +3,10 @@ import { LeaderboardEntry } from '../types';
 // Фейковые пользователи для рейтинга (имитация GET /api/leaderboard).
 // Текущий пользователь вставляется в список динамически по его XP.
 const FAKE_USERS: { displayName: string; totalXp: number }[] = [
-  { displayName: 'Дмитрий К.', totalXp: 4120 },
-  { displayName: 'Мария В.', totalXp: 3580 },
-  { displayName: 'Артём С.', totalXp: 3010 },
-  { displayName: 'Ольга П.', totalXp: 2470 },
+  { displayName: 'Лилия Л.', totalXp: 4120 },
+  { displayName: 'Шамиль В.', totalXp: 3580 },
+  { displayName: 'Айбулат Н.', totalXp: 3010 },
+  { displayName: 'Аббас А.', totalXp: 2470 },
   { displayName: 'Иван Л.', totalXp: 1990 },
   { displayName: 'Екатерина Ж.', totalXp: 1640 },
   { displayName: 'Никита Р.', totalXp: 1280 },

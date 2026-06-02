@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
+  Animated,
   StyleSheet,
   Text,
   TextStyle,
@@ -22,6 +23,11 @@ export const Card: React.FC<{ children: React.ReactNode; style?: ViewStyle }> = 
           padding: spacing.lg,
           borderWidth: 1,
           borderColor: colors.border,
+          shadowColor: '#000',
+          shadowOpacity: 0.18,
+          shadowRadius: 10,
+          shadowOffset: { width: 0, height: 4 },
+          elevation: 3,
         },
         style,
       ]}>
@@ -101,11 +107,16 @@ export const ProgressBar: React.FC<{ value: number; color?: string; height?: num
   height = 8,
 }) => {
   const { colors } = useTheme();
+  const anim = useRef(new Animated.Value(0)).current;
+  const target = Math.max(0, Math.min(1, value));
+  useEffect(() => {
+    Animated.timing(anim, { toValue: target, duration: 650, useNativeDriver: false }).start();
+  }, [anim, target]);
   return (
     <View style={{ backgroundColor: colors.cardAlt, overflow: 'hidden', width: '100%', height, borderRadius: height / 2 }}>
-      <View
+      <Animated.View
         style={{
-          width: `${Math.max(0, Math.min(1, value)) * 100}%`,
+          width: anim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] }),
           height,
           borderRadius: height / 2,
           backgroundColor: color ?? colors.accent,

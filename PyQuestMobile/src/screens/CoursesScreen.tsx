@@ -2,9 +2,11 @@ import React, { useCallback, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Palette, radius, spacing } from '../theme/theme';
+import { levelFromXp, Palette, radius, spacing, XP_PER_LEVEL, xpIntoLevel } from '../theme/theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeContext';
 import { Card, Pill, ProgressBar } from '../components/UI';
+import { Hero } from '../components/Hero';
+import { FadeInView } from '../components/Anim';
 import { CoursesStackParamList } from '../navigation/types';
 import { Course } from '../types';
 import * as api from '../api/mockApi';
@@ -41,35 +43,69 @@ export const CoursesScreen: React.FC = () => {
     }, [load]),
   );
 
-  const renderItem = ({ item }: { item: Course }) => {
+  const xp = user?.totalXp ?? 0;
+  const level = levelFromXp(xp);
+  const intoLevel = xpIntoLevel(xp);
+
+  const header = (
+    <FadeInView>
+      <Hero style={styles.hero}>
+        <View style={styles.heroInner}>
+          <View style={styles.heroTopRow}>
+            <View style={styles.flex}>
+              <Text style={styles.hello}>Привет, {user?.displayName || 'друг'}! 👋</Text>
+              <Text style={styles.helloSub}>Продолжим изучать Python</Text>
+            </View>
+            <View style={styles.levelBadge}>
+              <Text style={styles.levelBadgeNum}>{level}</Text>
+              <Text style={styles.levelBadgeLbl}>ур.</Text>
+            </View>
+          </View>
+          <View style={styles.heroXpRow}>
+            <Text style={styles.heroXp}>{xp} XP</Text>
+            <Text style={styles.heroXpNext}>до {level + 1} ур. · {XP_PER_LEVEL - intoLevel} XP</Text>
+          </View>
+          <ProgressBar value={intoLevel / XP_PER_LEVEL} color={'#FFD43B'} height={9} />
+        </View>
+      </Hero>
+      <Text style={styles.sectionTitle}>Курсы</Text>
+    </FadeInView>
+  );
+
+  const renderItem = ({ item, index }: { item: Course; index: number }) => {
     const lessons = lessonsByCourse(item.id);
     const progress = progressByCourse[item.id] ?? 0;
+    const accent = item.accent || colors.primary;
     return (
-      <TouchableOpacity
-        activeOpacity={0.85}
-        onPress={() => navigation.navigate('CourseDetail', { courseId: item.id, title: item.title })}>
-        <Card style={styles.card}>
-          <View style={styles.row}>
-            <View style={[styles.emojiBox, { backgroundColor: (item.accent || colors.primary) + '22' }]}>
-              <Text style={styles.emoji}>{item.emoji}</Text>
-            </View>
-            <View style={styles.flex}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.desc} numberOfLines={2}>
-                {item.description}
-              </Text>
-              <View style={styles.metaRow}>
-                <Pill text={DIFF_LABEL[item.difficulty]} color={item.accent} bg={(item.accent || '') + '22'} />
-                <Pill text={`${lessons.length} уроков`} />
+      <FadeInView delay={80 + index * 60}>
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate('CourseDetail', { courseId: item.id, title: item.title })}>
+          <Card style={styles.card}>
+            <View style={[styles.accentStripe, { backgroundColor: accent }]} />
+            <View style={styles.row}>
+              <View style={[styles.emojiBox, { backgroundColor: accent + '24' }]}>
+                <Text style={styles.emoji}>{item.emoji}</Text>
+              </View>
+              <View style={styles.flex}>
+                <Text style={styles.title}>{item.title}</Text>
+                <Text style={styles.desc} numberOfLines={2}>
+                  {item.description}
+                </Text>
+                <View style={styles.metaRow}>
+                  <Pill text={DIFF_LABEL[item.difficulty]} color={accent} bg={accent + '24'} />
+                  <Pill text={`${lessons.length} уроков`} />
+                  {progress >= 1 && <Pill text="✓ Завершён" color={colors.success} bg={colors.success + '22'} />}
+                </View>
               </View>
             </View>
-          </View>
-          <View style={styles.progressRow}>
-            <ProgressBar value={progress} color={item.accent} />
-            <Text style={styles.progressText}>{Math.round(progress * 100)}%</Text>
-          </View>
-        </Card>
-      </TouchableOpacity>
+            <View style={styles.progressRow}>
+              <ProgressBar value={progress} color={accent} />
+              <Text style={[styles.progressText, { color: accent }]}>{Math.round(progress * 100)}%</Text>
+            </View>
+          </Card>
+        </TouchableOpacity>
+      </FadeInView>
     );
   };
 
@@ -80,12 +116,7 @@ export const CoursesScreen: React.FC = () => {
         keyExtractor={(cc) => cc.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
-        ListHeaderComponent={
-          <View style={styles.header}>
-            <Text style={styles.greeting}>Привет, {user?.displayName || 'друг'}! 👋</Text>
-            <Text style={styles.headerSub}>Выбери курс и продолжай обучение</Text>
-          </View>
-        }
+        ListHeaderComponent={header}
         showsVerticalScrollIndicator={false}
       />
     </View>
@@ -96,17 +127,27 @@ const makeStyles = (c: Palette) =>
   StyleSheet.create({
     container: { flex: 1, backgroundColor: c.bg },
     list: { padding: spacing.lg, paddingBottom: spacing.xxl },
-    header: { marginBottom: spacing.lg },
-    greeting: { color: c.text, fontSize: 24, fontWeight: '800' },
-    headerSub: { color: c.textMuted, fontSize: 14, marginTop: 4 },
-    card: { marginBottom: spacing.md },
-    row: { flexDirection: 'row' },
     flex: { flex: 1 },
+    hero: { marginBottom: spacing.lg },
+    heroInner: { padding: spacing.lg },
+    heroTopRow: { flexDirection: 'row', alignItems: 'center' },
+    hello: { color: '#fff', fontSize: 22, fontWeight: '900' },
+    helloSub: { color: 'rgba(255,255,255,0.82)', fontSize: 13, marginTop: 2 },
+    levelBadge: { width: 54, height: 54, borderRadius: 27, backgroundColor: 'rgba(255,255,255,0.18)', borderWidth: 2, borderColor: 'rgba(255,255,255,0.5)', alignItems: 'center', justifyContent: 'center' },
+    levelBadgeNum: { color: '#fff', fontSize: 22, fontWeight: '900', lineHeight: 24 },
+    levelBadgeLbl: { color: 'rgba(255,255,255,0.85)', fontSize: 10, fontWeight: '700' },
+    heroXpRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: spacing.lg, marginBottom: spacing.sm },
+    heroXp: { color: '#fff', fontSize: 18, fontWeight: '800' },
+    heroXpNext: { color: 'rgba(255,255,255,0.85)', fontSize: 12 },
+    sectionTitle: { color: c.text, fontSize: 18, fontWeight: '800', marginBottom: spacing.md },
+    card: { marginBottom: spacing.md, overflow: 'hidden' },
+    accentStripe: { position: 'absolute', left: 0, top: 0, bottom: 0, width: 5 },
+    row: { flexDirection: 'row' },
     emojiBox: { width: 56, height: 56, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', marginRight: spacing.md },
     emoji: { fontSize: 30 },
     title: { color: c.text, fontSize: 17, fontWeight: '700' },
     desc: { color: c.textMuted, fontSize: 13, marginTop: 2 },
-    metaRow: { flexDirection: 'row', gap: 8, marginTop: spacing.sm },
+    metaRow: { flexDirection: 'row', gap: 8, marginTop: spacing.sm, flexWrap: 'wrap' },
     progressRow: { flexDirection: 'row', alignItems: 'center', marginTop: spacing.md, gap: spacing.md },
-    progressText: { color: c.textMuted, fontSize: 12, width: 38, textAlign: 'right' },
+    progressText: { fontSize: 12, fontWeight: '700', width: 38, textAlign: 'right' },
   });

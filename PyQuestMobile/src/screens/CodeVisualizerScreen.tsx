@@ -4,6 +4,7 @@ import { RouteProp, useRoute } from '@react-navigation/native';
 import { Palette, radius, spacing } from '../theme/theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeContext';
 import { Button, CodeBlock, Pill } from '../components/UI';
+import { FadeInView } from '../components/Anim';
 import { Icon } from '../components/Icon';
 import { CoursesStackParamList } from '../navigation/types';
 import { getTrace, TraceBundle } from '../data/traces';
@@ -76,12 +77,12 @@ export const CodeVisualizerScreen: React.FC = () => {
 
         <CodeBlock code={bundle.code} highlightLine={current?.lineno} style={{ marginTop: spacing.md }} />
 
-        <View style={styles.stepCard}>
+        <FadeInView key={step} offset={6} style={styles.stepCard}>
           <Text style={styles.stepCounter}>
             Шаг {step + 1} / {total} · строка {current?.lineno} · {current?.function}()
           </Text>
           {!!current?.note && <Text style={styles.note}>{current.note}</Text>}
-        </View>
+        </FadeInView>
 
         {/* Стек вызовов */}
         <Text style={styles.panelTitle}>Стек вызовов</Text>

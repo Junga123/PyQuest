@@ -5,6 +5,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { levelFromXp, Palette, spacing, XP_PER_LEVEL, xpIntoLevel } from '../theme/theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeContext';
 import { Button, Card, ProgressBar } from '../components/UI';
+import { Hero } from '../components/Hero';
+import { FadeInView } from '../components/Anim';
 import { Icon } from '../components/Icon';
 import { useApp } from '../context/AppContext';
 import * as api from '../api/mockApi';
@@ -42,56 +44,56 @@ export const ProfileScreen: React.FC = () => {
         message: `Я изучаю Python в PyQuest! 🐍 Уровень ${level}, ${xp} XP, достижений: ${unlocked}. Присоединяйся!`,
       });
     } catch {
-      /* отменено пользователем */
+      /* отменено */
     }
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <View style={styles.topBar}>
-        <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.iconBtn}>
-          <Icon name="sliders" size={22} color={colors.textMuted} />
-        </TouchableOpacity>
-      </View>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <FadeInView>
+        <Hero style={styles.hero}>
+          <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.gear} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+            <Icon name="sliders" size={22} color="#fff" />
+          </TouchableOpacity>
+          <View style={styles.heroInner}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{(user?.displayName || '?').slice(0, 1).toUpperCase()}</Text>
+            </View>
+            <Text style={styles.name}>{user?.displayName || 'Студент'}</Text>
+            <Text style={styles.email}>{user?.email}</Text>
 
-      <View style={styles.avatarWrap}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{(user?.displayName || '?').slice(0, 1).toUpperCase()}</Text>
+            <View style={styles.levelRow}>
+              <Text style={styles.levelLabel}>Уровень {level}</Text>
+              <Text style={styles.xpTotal}>{xp} XP</Text>
+            </View>
+            <ProgressBar value={intoLevel / XP_PER_LEVEL} color={'#FFD43B'} height={10} />
+            <Text style={styles.levelHint}>До уровня {level + 1}: {XP_PER_LEVEL - intoLevel} XP</Text>
+          </View>
+        </Hero>
+      </FadeInView>
+
+      <FadeInView delay={100}>
+        <View style={styles.statsRow}>
+          <Stat label="Уроков" value={stats?.lessonsCompleted ?? 0} styles={styles} />
+          <Stat label="Заданий" value={stats?.tasksSolved ?? 0} styles={styles} />
+          <Stat label="Наград" value={unlocked} styles={styles} />
         </View>
-        <Text style={styles.name}>{user?.displayName || 'Студент'}</Text>
-        <Text style={styles.email}>{user?.email}</Text>
-      </View>
+      </FadeInView>
 
-      <Card style={styles.levelCard}>
-        <View style={styles.levelRow}>
-          <Text style={styles.levelLabel}>Уровень {level}</Text>
-          <Text style={styles.xpTotal}>{xp} XP</Text>
-        </View>
-        <ProgressBar value={intoLevel / XP_PER_LEVEL} color={colors.accent} height={10} />
-        <Text style={styles.levelHint}>До уровня {level + 1}: {XP_PER_LEVEL - intoLevel} XP</Text>
-      </Card>
+      <FadeInView delay={160}>
+        <Button title="Поделиться прогрессом" variant="primary" icon={<Icon name="share" size={18} color="#06121F" />} onPress={shareProgress} style={{ marginTop: spacing.md }} />
 
-      <View style={styles.statsRow}>
-        <Stat label="Уроков пройдено" value={stats?.lessonsCompleted ?? 0} styles={styles} />
-        <Stat label="Заданий решено" value={stats?.tasksSolved ?? 0} styles={styles} />
-      </View>
-      <View style={styles.statsRow}>
-        <Stat label="Курсов начато" value={stats?.coursesStarted ?? 0} styles={styles} />
-        <Stat label="Достижений" value={unlocked} styles={styles} />
-      </View>
+        <Card style={styles.brandCard}>
+          <Image source={{ uri: LOGO_DATA_URI }} style={styles.brandLogo} />
+          <View style={styles.flex}>
+            <Text style={styles.brandTitle}>PyQuest — ВКР 2026</Text>
+            <Text style={styles.brandText}>Автор: Кутуева Алёна</Text>
+            <Text style={styles.brandTextDim}>Елабужский институт КФУ</Text>
+          </View>
+        </Card>
 
-      <Button title="Поделиться прогрессом" variant="primary" icon={<Icon name="share" size={18} color="#06121F" />} onPress={shareProgress} style={{ marginTop: spacing.md }} />
-
-      <Card style={styles.brandCard}>
-        <Image source={{ uri: LOGO_DATA_URI }} style={styles.brandLogo} />
-        <View style={styles.flex}>
-          <Text style={styles.brandTitle}>PyQuest — ВКР 2026</Text>
-          <Text style={styles.brandText}>Автор: Кутуева Алёна</Text>
-          <Text style={styles.brandTextDim}>Елабужский институт КФУ</Text>
-        </View>
-      </Card>
-
-      <Button title="Настройки" variant="ghost" icon={<Icon name="sliders" size={18} color={colors.text} />} onPress={() => navigation.navigate('Settings')} style={{ marginTop: spacing.lg }} />
+        <Button title="Настройки" variant="ghost" icon={<Icon name="sliders" size={18} color={colors.text} />} onPress={() => navigation.navigate('Settings')} style={{ marginTop: spacing.lg }} />
+      </FadeInView>
     </ScrollView>
   );
 };
@@ -108,21 +110,20 @@ const makeStyles = (c: Palette) =>
     container: { flex: 1, backgroundColor: c.bg },
     content: { padding: spacing.lg, paddingBottom: spacing.xxl },
     flex: { flex: 1 },
-    topBar: { flexDirection: 'row', justifyContent: 'flex-end' },
-    iconBtn: { padding: 8 },
-    avatarWrap: { alignItems: 'center', marginBottom: spacing.lg },
-    avatar: { width: 88, height: 88, borderRadius: 44, backgroundColor: c.primary, alignItems: 'center', justifyContent: 'center' },
+    hero: { marginBottom: spacing.md },
+    gear: { position: 'absolute', top: spacing.md, right: spacing.md, zIndex: 5, padding: 4 },
+    heroInner: { padding: spacing.lg, alignItems: 'center' },
+    avatar: { width: 84, height: 84, borderRadius: 42, backgroundColor: 'rgba(255,255,255,0.2)', borderWidth: 2, borderColor: 'rgba(255,255,255,0.6)', alignItems: 'center', justifyContent: 'center', marginTop: spacing.sm },
     avatarText: { color: '#fff', fontSize: 36, fontWeight: '900' },
-    name: { color: c.text, fontSize: 22, fontWeight: '800', marginTop: spacing.md },
-    email: { color: c.textMuted, fontSize: 14, marginTop: 2 },
-    levelCard: { marginBottom: spacing.md },
-    levelRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.sm },
-    levelLabel: { color: c.text, fontSize: 18, fontWeight: '700' },
-    xpTotal: { color: c.accentDark, fontSize: 18, fontWeight: '800' },
-    levelHint: { color: c.textMuted, fontSize: 13, marginTop: spacing.sm },
-    statsRow: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.md },
+    name: { color: '#fff', fontSize: 22, fontWeight: '800', marginTop: spacing.md },
+    email: { color: 'rgba(255,255,255,0.8)', fontSize: 13, marginTop: 2 },
+    levelRow: { flexDirection: 'row', justifyContent: 'space-between', alignSelf: 'stretch', marginTop: spacing.lg, marginBottom: spacing.sm },
+    levelLabel: { color: '#fff', fontSize: 16, fontWeight: '700' },
+    xpTotal: { color: '#FFD43B', fontSize: 16, fontWeight: '800' },
+    levelHint: { color: 'rgba(255,255,255,0.8)', fontSize: 12, alignSelf: 'flex-start', marginTop: spacing.sm },
+    statsRow: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.sm },
     stat: { flex: 1, alignItems: 'center', paddingVertical: spacing.lg },
-    statValue: { color: c.text, fontSize: 28, fontWeight: '900' },
+    statValue: { color: c.text, fontSize: 26, fontWeight: '900' },
     statLabel: { color: c.textMuted, fontSize: 12, marginTop: 4, textAlign: 'center' },
     brandCard: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginTop: spacing.lg },
     brandLogo: { width: 48, height: 48, borderRadius: 12 },
