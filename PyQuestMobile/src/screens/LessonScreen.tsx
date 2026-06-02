@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, Vibration, View } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Palette, radius, spacing } from '../theme/theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeContext';
-import { Button, Card, CodeBlock, Pill } from '../components/UI';
+import { Button, Card, CodeBlock, Pill, ProgressBar } from '../components/UI';
 import { CodeEditor } from '../components/CodeEditor';
 import { Hero } from '../components/Hero';
 import { FadeInView } from '../components/Anim';
@@ -118,6 +118,9 @@ export const LessonScreen: React.FC = () => {
         </Text>
         <Pill text={`+${task.xp_reward} XP`} color={styles._accent.color} bg={styles._accentBg.backgroundColor} />
       </View>
+      <View style={{ marginBottom: spacing.md }}>
+        <ProgressBar value={index / tasks.length} height={6} />
+      </View>
       <TaskView
         key={task.id}
         task={task}
@@ -162,6 +165,7 @@ const TaskView: React.FC<{
       if (res.ok) {
         setSolved(true);
         setFeedback({ ok: true, text: `Верно! +${res.xpEarned} XP` });
+        Vibration.vibrate(35);
         onSolved(res.xpEarned);
       } else {
         const why = res.output?.stderr ? `\n${res.output.stderr}` : '';

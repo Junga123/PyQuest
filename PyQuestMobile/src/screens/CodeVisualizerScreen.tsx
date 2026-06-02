@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { Palette, radius, spacing } from '../theme/theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeContext';
-import { Button, CodeBlock, Pill } from '../components/UI';
+import { Button, CodeBlock, Pill, ProgressBar } from '../components/UI';
 import { FadeInView } from '../components/Anim';
 import { Icon } from '../components/Icon';
 import { CoursesStackParamList } from '../navigation/types';
@@ -83,6 +83,10 @@ export const CodeVisualizerScreen: React.FC = () => {
           </Text>
           {!!current?.note && <Text style={styles.note}>{current.note}</Text>}
         </FadeInView>
+
+        <View style={{ marginTop: spacing.md }}>
+          <ProgressBar value={total > 1 ? step / (total - 1) : 1} color={colors.accent} height={6} />
+        </View>
 
         {/* Стек вызовов */}
         <Text style={styles.panelTitle}>Стек вызовов</Text>

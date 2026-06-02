@@ -109,21 +109,7 @@ export const LoginScreen: React.FC = () => {
             <View style={styles.divider} />
           </View>
 
-          {/* Соц-вход (мок: бэкенд замокан, OAuth не настраивается для демо) */}
-          <TouchableOpacity style={styles.social} onPress={demo} activeOpacity={0.85}>
-            <View style={[styles.socialBadge, { backgroundColor: '#fff' }]}>
-              <Text style={[styles.socialG, { color: '#4285F4' }]}>G</Text>
-            </View>
-            <Text style={styles.socialText}>Продолжить с Google</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.social} onPress={demo} activeOpacity={0.85}>
-            <View style={[styles.socialBadge, { backgroundColor: '#000' }]}>
-              <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff' }} />
-            </View>
-            <Text style={styles.socialText}>Продолжить с Apple</Text>
-          </TouchableOpacity>
-
-          <Button title="Войти как гость (демо)" variant="ghost" onPress={demo} style={{ marginTop: spacing.md }} />
+          <Button title="Войти как гость (демо)" variant="ghost" onPress={demo} />
         </View>
 
         <View style={styles.footer}>
