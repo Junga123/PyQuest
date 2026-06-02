@@ -29,11 +29,12 @@ const CoursesStack: React.FC = () => {
     headerStyle: { backgroundColor: colors.bgElevated },
     headerTintColor: colors.text,
     headerTitleStyle: { fontWeight: '700' as const },
+    headerShadowVisible: false,
     contentStyle: { backgroundColor: colors.bg },
   };
   return (
     <Stack.Navigator screenOptions={screenOptions}>
-      <Stack.Screen name="Courses" component={CoursesScreen} options={{ title: 'PyQuest' }} />
+      <Stack.Screen name="Courses" component={CoursesScreen} options={{ headerShown: false }} />
       <Stack.Screen name="CourseDetail" component={CourseDetailScreen} options={({ route }) => ({ title: route.params.title })} />
       <Stack.Screen name="Lesson" component={LessonScreen} options={({ route }) => ({ title: route.params.title })} />
       <Stack.Screen name="CodeVisualizer" component={CodeVisualizerScreen} options={{ title: 'Визуализация' }} />
@@ -47,11 +48,12 @@ const ProfileStack: React.FC = () => {
     headerStyle: { backgroundColor: colors.bgElevated },
     headerTintColor: colors.text,
     headerTitleStyle: { fontWeight: '700' as const },
+    headerShadowVisible: false,
     contentStyle: { backgroundColor: colors.bg },
   };
   return (
     <ProfileNav.Navigator screenOptions={screenOptions}>
-      <ProfileNav.Screen name="Profile" component={ProfileScreen} options={{ title: t('tab.profile') }} />
+      <ProfileNav.Screen name="Profile" component={ProfileScreen} options={{ headerShown: false }} />
       <ProfileNav.Screen name="Settings" component={SettingsScreen} options={{ title: t('settings.title') }} />
     </ProfileNav.Navigator>
   );
@@ -65,10 +67,23 @@ const MainTabs: React.FC = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarStyle: { backgroundColor: colors.bgElevated, borderTopColor: colors.border, height: 62, paddingBottom: 8, paddingTop: 6 },
+        tabBarStyle: {
+          backgroundColor: colors.bgElevated,
+          borderTopWidth: 0,
+          height: 66,
+          paddingBottom: 10,
+          paddingTop: 8,
+          borderTopLeftRadius: 22,
+          borderTopRightRadius: 22,
+          shadowColor: '#000',
+          shadowOpacity: 0.25,
+          shadowRadius: 12,
+          shadowOffset: { width: 0, height: -3 },
+          elevation: 16,
+        },
         tabBarActiveTintColor: colors.accentDark,
         tabBarInactiveTintColor: colors.textDim,
-        tabBarLabelStyle: { fontSize: 11 },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
       }}>
       <Tab.Screen name="CoursesTab" component={CoursesStack} options={{ title: t('tab.courses'), tabBarIcon: makeTabIcon('book') }} />
       <Tab.Screen name="LeaderboardTab" component={LeaderboardScreen} options={{ title: t('tab.leaderboard'), tabBarIcon: makeTabIcon('chart') }} />

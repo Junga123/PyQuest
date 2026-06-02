@@ -1,12 +1,14 @@
 import React, { useCallback, useState } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { levelFromXp, Palette, radius, spacing, XP_PER_LEVEL, xpIntoLevel } from '../theme/theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeContext';
 import { Card, Pill, ProgressBar } from '../components/UI';
 import { Hero } from '../components/Hero';
 import { FadeInView } from '../components/Anim';
+import { LOGO_DATA_URI } from '../data/images';
 import { CoursesStackParamList } from '../navigation/types';
 import { Course } from '../types';
 import * as api from '../api/mockApi';
@@ -22,6 +24,7 @@ export const CoursesScreen: React.FC = () => {
   const { user } = useApp();
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
+  const insets = useSafeAreaInsets();
   const [courses, setCourses] = useState<Course[]>([]);
   const [progressByCourse, setProgressByCourse] = useState<Record<string, number>>({});
 
@@ -51,6 +54,10 @@ export const CoursesScreen: React.FC = () => {
     <FadeInView>
       <Hero style={styles.hero}>
         <View style={styles.heroInner}>
+          <View style={styles.brandRow}>
+            <Image source={{ uri: LOGO_DATA_URI }} style={styles.brandLogo} />
+            <Text style={styles.brandName}>PyQuest</Text>
+          </View>
           <View style={styles.heroTopRow}>
             <View style={styles.flex}>
               <Text style={styles.hello}>Привет, {user?.displayName || 'друг'}! 👋</Text>
@@ -115,7 +122,7 @@ export const CoursesScreen: React.FC = () => {
         data={courses}
         keyExtractor={(cc) => cc.id}
         renderItem={renderItem}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[styles.list, { paddingTop: insets.top + spacing.md }]}
         ListHeaderComponent={header}
         showsVerticalScrollIndicator={false}
       />
@@ -130,6 +137,9 @@ const makeStyles = (c: Palette) =>
     flex: { flex: 1 },
     hero: { marginBottom: spacing.lg },
     heroInner: { padding: spacing.lg },
+    brandRow: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.md },
+    brandLogo: { width: 26, height: 26, borderRadius: 7, marginRight: 8 },
+    brandName: { color: '#fff', fontSize: 16, fontWeight: '900', letterSpacing: 0.5 },
     heroTopRow: { flexDirection: 'row', alignItems: 'center' },
     hello: { color: '#fff', fontSize: 22, fontWeight: '900' },
     helloSub: { color: 'rgba(255,255,255,0.82)', fontSize: 13, marginTop: 2 },

@@ -15,6 +15,7 @@ export const LoadingScreen: React.FC = () => {
       <ActivityIndicator color={colors.accent} style={{ marginTop: spacing.xl }} />
       <View style={styles.footer}>
         <Text style={styles.author}>Автор: Кутуева Алёна</Text>
+        <Text style={styles.org}>Науч. руководитель: Анисимова Эллина Сергеевна</Text>
         <Text style={styles.org}>Елабужский институт КФУ · 2026</Text>
       </View>
     </View>

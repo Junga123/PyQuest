@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { Image, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { levelFromXp, Palette, spacing, XP_PER_LEVEL, xpIntoLevel } from '../theme/theme';
 import { useTheme, useThemedStyles } from '../theme/ThemeContext';
 import { Button, Card, ProgressBar } from '../components/UI';
@@ -21,6 +22,7 @@ export const ProfileScreen: React.FC = () => {
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
   const navigation = useNavigation<Nav>();
+  const insets = useSafeAreaInsets();
   const [unlocked, setUnlocked] = useState(0);
 
   useFocusEffect(
@@ -49,7 +51,7 @@ export const ProfileScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <ScrollView style={styles.container} contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.md }]} showsVerticalScrollIndicator={false}>
       <FadeInView>
         <Hero style={styles.hero}>
           <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.gear} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
@@ -88,6 +90,7 @@ export const ProfileScreen: React.FC = () => {
           <View style={styles.flex}>
             <Text style={styles.brandTitle}>PyQuest — ВКР 2026</Text>
             <Text style={styles.brandText}>Автор: Кутуева Алёна</Text>
+            <Text style={styles.brandTextDim}>Науч. рук.: Анисимова Эллина Сергеевна</Text>
             <Text style={styles.brandTextDim}>Елабужский институт КФУ</Text>
           </View>
         </Card>

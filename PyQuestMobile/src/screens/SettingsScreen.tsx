@@ -43,8 +43,17 @@ export const SettingsScreen: React.FC = () => {
         </TouchableOpacity>
         <View style={styles.divider} />
         <View style={[styles.row, { opacity: 0.5 }]}>
+          <Text style={styles.rowTitle}>Татарский</Text>
+          <View style={styles.soonPill}>
+            <Text style={styles.soonText}> скоро</Text>
+          </View>
+        </View>
+        <View style={styles.divider} />
+        <View style={[styles.row, { opacity: 0.5 }]}>
           <Text style={styles.rowTitle}>English</Text>
-          <Text style={styles.rowSub}>скоро</Text>
+          <View style={styles.soonPill}>
+            <Text style={styles.soonText}> скоро</Text>
+          </View>
         </View>
       </Card>
 
@@ -56,8 +65,9 @@ export const SettingsScreen: React.FC = () => {
           с автопроверкой и пошаговая визуализация исполнения кода.
         </Text>
         <View style={styles.divider} />
-        <Text style={styles.aboutMeta}>Версия 1.1.0</Text>
-        <Text style={styles.aboutMeta}>ВКР 2026 · Кутуева Алёна</Text>
+        <Text style={styles.aboutMeta}>Версия 1.2.0</Text>
+        <Text style={styles.aboutMeta}>ВКР 2026 · Автор: Кутуева Алёна</Text>
+        <Text style={styles.aboutMeta}>Научный руководитель: Анисимова Эллина Сергеевна</Text>
         <Text style={styles.aboutMeta}>Елабужский институт КФУ</Text>
       </Card>
 
@@ -78,6 +88,8 @@ const makeStyles = (c: Palette) =>
     rowTitle: { color: c.text, fontSize: 16, fontWeight: '600' },
     rowSub: { color: c.textMuted, fontSize: 13, marginTop: 2 },
     check: { color: c.success, fontSize: 18, fontWeight: '800' },
+    soonPill: { backgroundColor: c.cardAlt, borderRadius: radius.sm, paddingHorizontal: 10, paddingVertical: 4 },
+    soonText: { color: c.textMuted, fontSize: 12, fontWeight: '600' },
     divider: { height: 1, backgroundColor: c.border },
     aboutTitle: { color: c.text, fontSize: 18, fontWeight: '800' },
     aboutText: { color: c.textMuted, fontSize: 14, lineHeight: 21, marginTop: spacing.sm, marginBottom: spacing.md },

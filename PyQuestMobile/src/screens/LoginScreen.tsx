@@ -127,7 +127,9 @@ export const LoginScreen: React.FC = () => {
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.author}>Кутуева Алёна · Елабужский институт КФУ · 2026</Text>
+          <Text style={styles.author}>Автор: Кутуева Алёна</Text>
+          <Text style={styles.author}>Науч. рук.: Анисимова Эллина Сергеевна</Text>
+          <Text style={styles.author}>Елабужский институт КФУ · 2026</Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
