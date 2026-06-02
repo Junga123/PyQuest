@@ -33,3 +33,5 @@ PyQuestMobile/tools/logo_b64.txt
 
 # debug.keystore НЕ игнорируем — нужен для подписи release-APK в CI
 !**/debug.keystore
+
+.claude/
