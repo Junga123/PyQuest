@@ -479,3 +479,11 @@ export function findLesson(id: string): Lesson | undefined {
 export function findCourse(id: string): Course | undefined {
   return COURSES.find((c) => c.id === id);
 }
+
+// Первый незавершённый урок (для кнопки «Продолжить обучение»).
+export function firstIncompleteLesson(completedLessonIds: Set<string>): Lesson | null {
+  for (const l of LESSONS) {
+    if (!completedLessonIds.has(l.id)) return l;
+  }
+  return null;
+}

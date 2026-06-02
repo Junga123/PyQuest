@@ -8,6 +8,7 @@ import { Button, Card, CodeBlock, Pill } from '../components/UI';
 import { CodeEditor } from '../components/CodeEditor';
 import { Hero } from '../components/Hero';
 import { FadeInView } from '../components/Anim';
+import { Confetti } from '../components/Confetti';
 import { Icon } from '../components/Icon';
 import { CoursesStackParamList } from '../navigation/types';
 import { CodeValidation, FillGapValidation, Lesson, MultipleChoiceValidation, Task } from '../types';
@@ -89,6 +90,7 @@ export const LessonScreen: React.FC = () => {
   if (phase === 'done') {
     return (
       <View style={styles.doneWrap}>
+        <Confetti />
         <FadeInView offset={20}>
           <Hero style={styles.doneHero}>
             <View style={styles.doneInner}>

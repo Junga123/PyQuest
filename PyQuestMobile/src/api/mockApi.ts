@@ -64,6 +64,26 @@ const K_USERS = 'users';
 const K_SESSION = 'session_email';
 const K_PROGRESS = 'progress'; // { [lessonId]: LessonProgress }
 const K_SOLVED = 'solved_task_ids';
+const K_STREAK = 'streak'; // { count, lastDate }
+
+// Стрик активности: серия дней подряд с решёнными заданиями.
+export async function touchStreak(): Promise<number> {
+  const today = new Date();
+  const todayStr = today.toDateString();
+  const yStr = new Date(today.getTime() - 86400000).toDateString();
+  const cur = await loadJSON<{ count: number; lastDate: string }>(K_STREAK, { count: 0, lastDate: '' });
+  let next = cur.count;
+  if (cur.lastDate === todayStr) next = cur.count || 1;
+  else if (cur.lastDate === yStr) next = cur.count + 1;
+  else next = 1;
+  await saveJSON(K_STREAK, { count: next, lastDate: todayStr });
+  return next;
+}
+
+export async function getStreak(): Promise<number> {
+  const cur = await loadJSON<{ count: number; lastDate: string }>(K_STREAK, { count: 0, lastDate: '' });
+  return cur.count;
+}
 
 async function getUsers(): Promise<Record<string, StoredUser>> {
   return loadJSON<Record<string, StoredUser>>(K_USERS, {});
@@ -301,6 +321,7 @@ export async function attemptTask(
       const solved = new Set(await getSolvedSet());
       solved.add(taskId);
       await saveJSON(K_SOLVED, Array.from(solved));
+      await touchStreak();
 
       const session = await getSession();
       if (session) {
@@ -320,12 +341,14 @@ export interface UserStats {
   lessonsCompleted: number;
   tasksSolved: number;
   coursesStarted: number;
+  streak: number;
 }
 
 export async function getStats(): Promise<UserStats> {
   const user = await getSession();
   const all = await getAllProgress();
   const solved = await getSolvedSet();
+  const streak = await getStreak();
   const lessonsCompleted = Object.values(all).filter((p) => p.status === 'completed').length;
   const startedCourseIds = new Set(
     Object.keys(all)
@@ -338,6 +361,7 @@ export async function getStats(): Promise<UserStats> {
     lessonsCompleted,
     tasksSolved: solved.length,
     coursesStarted: startedCourseIds.size,
+    streak,
   };
 }
 

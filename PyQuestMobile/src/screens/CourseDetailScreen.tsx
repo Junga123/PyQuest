@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RouteProp, useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Palette, radius, spacing } from '../theme/theme';
@@ -9,6 +9,7 @@ import { CoursesStackParamList } from '../navigation/types';
 import { Lesson, LessonProgress } from '../types';
 import * as api from '../api/mockApi';
 import { findCourse, tasksByLesson } from '../data/courses';
+import { COURSE_ICON } from '../data/courseIcons';
 
 type Nav = NativeStackNavigationProp<CoursesStackParamList, 'CourseDetail'>;
 type Rt = RouteProp<CoursesStackParamList, 'CourseDetail'>;
@@ -50,7 +51,9 @@ export const CourseDetailScreen: React.FC = () => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
       <View style={styles.mapHeader}>
-        <Text style={styles.mapEmoji}>{course?.emoji}</Text>
+        <View style={[styles.mapIconBox, { backgroundColor: accent + '24' }]}>
+          <Image source={{ uri: COURSE_ICON[courseId] }} style={{ width: 38, height: 38, tintColor: accent }} resizeMode="contain" />
+        </View>
         <Text style={styles.mapTitle}>{course?.title}</Text>
         <Text style={styles.mapSub}>
           Пройдено {completedCount} из {lessons.length} квестов
@@ -108,7 +111,7 @@ const makeStyles = (c: Palette) =>
     container: { flex: 1, backgroundColor: c.bg },
     content: { padding: spacing.lg },
     mapHeader: { alignItems: 'center', marginBottom: spacing.lg },
-    mapEmoji: { fontSize: 40 },
+    mapIconBox: { width: 64, height: 64, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm },
     mapTitle: { color: c.text, fontSize: 22, fontWeight: '800', marginTop: spacing.sm },
     mapSub: { color: c.textMuted, fontSize: 13, marginTop: 2 },
     rowWrap: { flexDirection: 'row' },

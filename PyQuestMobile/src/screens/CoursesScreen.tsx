@@ -9,11 +9,13 @@ import { Card, Pill, ProgressBar } from '../components/UI';
 import { Hero } from '../components/Hero';
 import { FadeInView } from '../components/Anim';
 import { LOGO_DATA_URI } from '../data/images';
+import { COURSE_ICON } from '../data/courseIcons';
 import { CoursesStackParamList } from '../navigation/types';
-import { Course } from '../types';
+import { Course, Lesson } from '../types';
 import * as api from '../api/mockApi';
-import { lessonsByCourse } from '../data/courses';
+import { findCourse, firstIncompleteLesson, lessonsByCourse } from '../data/courses';
 import { useApp } from '../context/AppContext';
+import { BADGE_FLAME } from '../data/assets';
 
 type Nav = NativeStackNavigationProp<CoursesStackParamList, 'Courses'>;
 
@@ -27,10 +29,13 @@ export const CoursesScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const [courses, setCourses] = useState<Course[]>([]);
   const [progressByCourse, setProgressByCourse] = useState<Record<string, number>>({});
+  const [streak, setStreak] = useState(0);
+  const [nextLes, setNextLes] = useState<Lesson | null>(null);
 
   const load = useCallback(async () => {
-    const [cs, allProgress] = await Promise.all([api.getCourses(), api.getAllProgress()]);
+    const [cs, allProgress, stats] = await Promise.all([api.getCourses(), api.getAllProgress(), api.getStats()]);
     setCourses(cs);
+    setStreak(stats.streak);
     const map: Record<string, number> = {};
     for (const cc of cs) {
       const lessons = lessonsByCourse(cc.id);
@@ -38,6 +43,8 @@ export const CoursesScreen: React.FC = () => {
       map[cc.id] = lessons.length ? done / lessons.length : 0;
     }
     setProgressByCourse(map);
+    const completed = new Set(Object.values(allProgress).filter((p) => p.status === 'completed').map((p) => p.lesson_id));
+    setNextLes(firstIncompleteLesson(completed));
   }, []);
 
   useFocusEffect(
@@ -63,6 +70,10 @@ export const CoursesScreen: React.FC = () => {
               <Text style={styles.hello}>Привет, {user?.displayName || 'друг'}! 👋</Text>
               <Text style={styles.helloSub}>Продолжим изучать Python</Text>
             </View>
+            <View style={styles.streakChip}>
+              <Image source={{ uri: BADGE_FLAME }} style={{ width: 16, height: 16, tintColor: '#FFD43B' }} resizeMode="contain" />
+              <Text style={styles.streakNum}>{streak}</Text>
+            </View>
             <View style={styles.levelBadge}>
               <Text style={styles.levelBadgeNum}>{level}</Text>
               <Text style={styles.levelBadgeLbl}>ур.</Text>
@@ -75,6 +86,24 @@ export const CoursesScreen: React.FC = () => {
           <ProgressBar value={intoLevel / XP_PER_LEVEL} color={'#FFD43B'} height={9} />
         </View>
       </Hero>
+
+      {nextLes && (
+        <TouchableOpacity
+          activeOpacity={0.88}
+          onPress={() => navigation.navigate('Lesson', { lessonId: nextLes.id, title: nextLes.title })}>
+          <Card style={styles.continueCard}>
+            <View style={styles.continuePlay}>
+              <View style={styles.playTriangle} />
+            </View>
+            <View style={styles.flex}>
+              <Text style={styles.continueLabel}>ПРОДОЛЖИТЬ ОБУЧЕНИЕ</Text>
+              <Text style={styles.continueTitle} numberOfLines={1}>{nextLes.title}</Text>
+              <Text style={styles.continueCourse}>{findCourse(nextLes.course_id)?.title}</Text>
+            </View>
+          </Card>
+        </TouchableOpacity>
+      )}
+
       <Text style={styles.sectionTitle}>Курсы</Text>
     </FadeInView>
   );
@@ -92,7 +121,7 @@ export const CoursesScreen: React.FC = () => {
             <View style={[styles.accentStripe, { backgroundColor: accent }]} />
             <View style={styles.row}>
               <View style={[styles.emojiBox, { backgroundColor: accent + '24' }]}>
-                <Text style={styles.emoji}>{item.emoji}</Text>
+                <Image source={{ uri: COURSE_ICON[item.id] }} style={{ width: 32, height: 32, tintColor: accent }} resizeMode="contain" />
               </View>
               <View style={styles.flex}>
                 <Text style={styles.title}>{item.title}</Text>
@@ -149,6 +178,14 @@ const makeStyles = (c: Palette) =>
     heroXpRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: spacing.lg, marginBottom: spacing.sm },
     heroXp: { color: '#fff', fontSize: 18, fontWeight: '800' },
     heroXpNext: { color: 'rgba(255,255,255,0.85)', fontSize: 12 },
+    streakChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.22)', borderRadius: 14, paddingHorizontal: 10, paddingVertical: 5, marginRight: spacing.sm },
+    streakNum: { color: '#fff', fontSize: 14, fontWeight: '800', marginLeft: 5 },
+    continueCard: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.lg },
+    continuePlay: { width: 46, height: 46, borderRadius: 23, backgroundColor: c.accent, alignItems: 'center', justifyContent: 'center', marginRight: spacing.md },
+    playTriangle: { width: 0, height: 0, borderTopWidth: 9, borderBottomWidth: 9, borderLeftWidth: 14, borderTopColor: 'transparent', borderBottomColor: 'transparent', borderLeftColor: c.accentText, marginLeft: 4 },
+    continueLabel: { color: c.accentDark, fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
+    continueTitle: { color: c.text, fontSize: 16, fontWeight: '700', marginTop: 2 },
+    continueCourse: { color: c.textMuted, fontSize: 12, marginTop: 1 },
     sectionTitle: { color: c.text, fontSize: 18, fontWeight: '800', marginBottom: spacing.md },
     card: { marginBottom: spacing.md, overflow: 'hidden' },
     accentStripe: { position: 'absolute', left: 0, top: 0, bottom: 0, width: 5 },
