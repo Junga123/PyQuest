@@ -110,7 +110,7 @@ const Stat: React.FC<{ label: string; value: number; styles: any }> = ({ label, 
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    container: { flex: 1, backgroundColor: c.bg },
+    container: { flex: 1, backgroundColor: 'transparent' },
     content: { padding: spacing.lg, paddingBottom: spacing.xxl },
     flex: { flex: 1 },
     hero: { marginBottom: spacing.md },

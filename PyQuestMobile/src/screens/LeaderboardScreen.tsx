@@ -86,7 +86,7 @@ export const LeaderboardScreen: React.FC = () => {
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    container: { flex: 1, backgroundColor: c.bg },
+    container: { flex: 1, backgroundColor: 'transparent' },
     list: { padding: spacing.lg, paddingBottom: spacing.xxl },
     hero: { marginBottom: spacing.lg },
     heroInner: { padding: spacing.lg },

@@ -79,7 +79,7 @@ export const SettingsScreen: React.FC = () => {
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    container: { flex: 1, backgroundColor: c.bg },
+    container: { flex: 1, backgroundColor: 'transparent' },
     content: { padding: spacing.lg, paddingBottom: spacing.xxl },
     section: { color: c.textMuted, fontSize: 13, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5, marginTop: spacing.lg, marginBottom: spacing.sm },
     card: { paddingVertical: spacing.sm },

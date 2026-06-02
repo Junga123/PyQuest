@@ -108,7 +108,7 @@ export const CourseDetailScreen: React.FC = () => {
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    container: { flex: 1, backgroundColor: c.bg },
+    container: { flex: 1, backgroundColor: 'transparent' },
     content: { padding: spacing.lg },
     mapHeader: { alignItems: 'center', marginBottom: spacing.lg },
     mapIconBox: { width: 64, height: 64, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm },

@@ -161,7 +161,7 @@ export const CoursesScreen: React.FC = () => {
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    container: { flex: 1, backgroundColor: c.bg },
+    container: { flex: 1, backgroundColor: 'transparent' },
     list: { padding: spacing.lg, paddingBottom: spacing.xxl },
     flex: { flex: 1 },
     hero: { marginBottom: spacing.lg },

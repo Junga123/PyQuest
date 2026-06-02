@@ -26,11 +26,11 @@ const AuthStack = createNativeStackNavigator();
 const CoursesStack: React.FC = () => {
   const { colors } = useTheme();
   const screenOptions = {
-    headerStyle: { backgroundColor: colors.bgElevated },
+    headerStyle: { backgroundColor: colors.glassStrong },
     headerTintColor: colors.text,
     headerTitleStyle: { fontWeight: '700' as const },
     headerShadowVisible: false,
-    contentStyle: { backgroundColor: colors.bg },
+    contentStyle: { backgroundColor: 'transparent' },
   };
   return (
     <Stack.Navigator screenOptions={screenOptions}>
@@ -45,11 +45,11 @@ const CoursesStack: React.FC = () => {
 const ProfileStack: React.FC = () => {
   const { colors } = useTheme();
   const screenOptions = {
-    headerStyle: { backgroundColor: colors.bgElevated },
+    headerStyle: { backgroundColor: colors.glassStrong },
     headerTintColor: colors.text,
     headerTitleStyle: { fontWeight: '700' as const },
     headerShadowVisible: false,
-    contentStyle: { backgroundColor: colors.bg },
+    contentStyle: { backgroundColor: 'transparent' },
   };
   return (
     <ProfileNav.Navigator screenOptions={screenOptions}>
@@ -65,12 +65,13 @@ const MainTabs: React.FC = () => {
   const { colors } = useTheme();
   return (
     <Tab.Navigator
+      sceneContainerStyle={{ backgroundColor: 'transparent' }}
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colors.bgElevated,
+          backgroundColor: colors.glassStrong,
           borderTopWidth: 1,
-          borderTopColor: colors.border,
+          borderTopColor: colors.glassBorder,
           height: 64,
           paddingBottom: 9,
           paddingTop: 8,
@@ -97,10 +98,10 @@ export const RootNavigator: React.FC = () => {
     ...base,
     colors: {
       ...base.colors,
-      background: colors.bg,
-      card: colors.bgElevated,
+      background: 'transparent',
+      card: colors.glassStrong,
       text: colors.text,
-      border: colors.border,
+      border: colors.glassBorder,
       primary: colors.accentDark,
       notification: colors.accent,
     },

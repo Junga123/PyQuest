@@ -24,7 +24,7 @@ export const LoadingScreen: React.FC = () => {
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    container: { flex: 1, backgroundColor: c.bg, alignItems: 'center', justifyContent: 'center' },
+    container: { flex: 1, backgroundColor: 'transparent', alignItems: 'center', justifyContent: 'center' },
     logo: { width: 120, height: 120, borderRadius: 28 },
     title: { color: c.text, fontSize: 34, fontWeight: '900', marginTop: spacing.lg, letterSpacing: 0.5 },
     tagline: { color: c.textMuted, fontSize: 15, marginTop: spacing.xs },

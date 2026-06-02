@@ -124,7 +124,7 @@ export const LoginScreen: React.FC = () => {
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    flex: { flex: 1, backgroundColor: c.bg },
+    flex: { flex: 1, backgroundColor: 'transparent' },
     container: { flexGrow: 1, padding: spacing.xl, justifyContent: 'center', alignItems: 'center' },
     logo: { width: 84, height: 84, borderRadius: 20 },
     title: { color: c.text, fontSize: 30, fontWeight: '900', marginTop: spacing.md },

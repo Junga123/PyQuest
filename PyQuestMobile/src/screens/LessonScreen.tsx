@@ -298,9 +298,9 @@ const TASK_TYPE_LABEL: Record<string, string> = {
 
 const makeStyles = (c: Palette) =>
   StyleSheet.create({
-    container: { flex: 1, backgroundColor: c.bg },
+    container: { flex: 1, backgroundColor: 'transparent' },
     content: { padding: spacing.lg, paddingBottom: spacing.xxl },
-    center: { flex: 1, backgroundColor: c.bg, alignItems: 'center', justifyContent: 'center', padding: spacing.xl },
+    center: { flex: 1, backgroundColor: 'transparent', alignItems: 'center', justifyContent: 'center', padding: spacing.xl },
     h1: { color: c.text, fontSize: 24, fontWeight: '800', marginTop: spacing.sm },
     lead: { color: c.textMuted, fontSize: 15, marginTop: spacing.sm, lineHeight: 22 },
     paragraph: { color: c.text, fontSize: 15, lineHeight: 23, marginTop: spacing.md },
@@ -321,7 +321,7 @@ const makeStyles = (c: Palette) =>
     hint: { color: c.textMuted, fontSize: 14, marginTop: spacing.sm, fontStyle: 'italic', lineHeight: 21 },
     feedback: { borderRadius: radius.md, padding: spacing.md, marginTop: spacing.lg },
     feedbackText: { fontSize: 14, fontWeight: '600', lineHeight: 20 },
-    doneWrap: { flex: 1, backgroundColor: c.bg, justifyContent: 'center', padding: spacing.lg },
+    doneWrap: { flex: 1, backgroundColor: 'transparent', justifyContent: 'center', padding: spacing.lg },
     doneHero: {},
     doneInner: { padding: spacing.xl, alignItems: 'center' },
     doneTitle: { color: '#fff', fontSize: 26, fontWeight: '900', marginTop: spacing.sm },

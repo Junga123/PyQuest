@@ -26,6 +26,12 @@ export interface Palette {
   textMuted: string;
   textDim: string;
 
+  // glassmorphism: полупрозрачные «стеклянные» поверхности + блик
+  glass: string;
+  glassStrong: string;
+  glassBorder: string;
+  glassHi: string;
+
   // code-поверхности (всегда тёмные)
   codeBg: string;
   codeBgAlt: string;
@@ -76,6 +82,11 @@ export const darkColors: Palette = {
   textMuted: '#9AACCB',
   textDim: '#6B7DA3',
 
+  glass: 'rgba(255,255,255,0.07)',
+  glassStrong: 'rgba(18,26,48,0.72)',
+  glassBorder: 'rgba(255,255,255,0.16)',
+  glassHi: 'rgba(255,255,255,0.30)',
+
   ...syntax,
 };
 
@@ -101,6 +112,11 @@ export const lightColors: Palette = {
   text: '#142036',
   textMuted: '#566179',
   textDim: '#8A97AD',
+
+  glass: 'rgba(255,255,255,0.55)',
+  glassStrong: 'rgba(255,255,255,0.78)',
+  glassBorder: 'rgba(255,255,255,0.85)',
+  glassHi: 'rgba(255,255,255,0.95)',
 
   ...syntax,
 };

@@ -18,19 +18,25 @@ export const Card: React.FC<{ children: React.ReactNode; style?: ViewStyle }> = 
     <View
       style={[
         {
-          backgroundColor: colors.card,
+          backgroundColor: colors.glass,
           borderRadius: radius.lg,
           padding: spacing.lg,
           borderWidth: 1,
-          borderColor: colors.border,
+          borderColor: colors.glassBorder,
+          overflow: 'hidden',
           shadowColor: '#000',
-          shadowOpacity: 0.18,
-          shadowRadius: 10,
-          shadowOffset: { width: 0, height: 4 },
-          elevation: 3,
+          shadowOpacity: 0.22,
+          shadowRadius: 14,
+          shadowOffset: { width: 0, height: 6 },
+          elevation: 4,
         },
         style,
       ]}>
+      {/* стеклянный блик по верхней кромке */}
+      <View
+        pointerEvents="none"
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 1.5, backgroundColor: colors.glassHi }}
+      />
       {children}
     </View>
   );
