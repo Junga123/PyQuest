@@ -1,0 +1,35 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Сборки / артефакты
+**/android/app/build/
+**/android/build/
+**/android/.gradle/
+**/build/
+**/.next/
+*.apk
+*.aab
+
+# RN / Metro
+**/.bundle/
+*.jsbundle
+**/metro-health-check*
+
+# IDE / ОС
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Локальные env
+**/.env
+**/.env.local
+**/local.properties
+
+# Сгенерированные инструментами артефакты
+PyQuestMobile/tools/logo_b64.txt
+
+# debug.keystore НЕ игнорируем — нужен для подписи release-APK в CI
+!**/debug.keystore

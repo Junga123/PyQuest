@@ -1,0 +1,65 @@
+import React, { useCallback, useState } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { colors, radius, spacing } from '../theme/theme';
+import { Card } from '../components/UI';
+import { buildLeaderboard } from '../data/leaderboard';
+import { LeaderboardEntry } from '../types';
+import { useApp } from '../context/AppContext';
+
+const MEDALS: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
+
+export const LeaderboardScreen: React.FC = () => {
+  const { user } = useApp();
+  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      setEntries(
+        buildLeaderboard({
+          displayName: user?.displayName || 'Вы',
+          totalXp: user?.totalXp ?? 0,
+        }),
+      );
+    }, [user]),
+  );
+
+  const renderItem = ({ item }: { item: LeaderboardEntry }) => (
+    <Card style={[styles.row, item.isCurrentUser && styles.me]}>
+      <Text style={styles.rank}>{MEDALS[item.rank] || item.rank}</Text>
+      <View style={styles.flex}>
+        <Text style={[styles.name, item.isCurrentUser && { color: colors.accent }]}>
+          {item.displayName} {item.isCurrentUser ? '(вы)' : ''}
+        </Text>
+        <Text style={styles.level}>Уровень {item.level}</Text>
+      </View>
+      <Text style={styles.xp}>{item.totalXp} XP</Text>
+    </Card>
+  );
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={entries}
+        keyExtractor={(e) => `${e.rank}-${e.displayName}`}
+        renderItem={renderItem}
+        contentContainerStyle={styles.list}
+        ListHeaderComponent={<Text style={styles.header}>🏆 Рейтинг игроков</Text>}
+        showsVerticalScrollIndicator={false}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.bg },
+  list: { padding: spacing.lg, paddingBottom: spacing.xxl },
+  header: { color: colors.text, fontSize: 22, fontWeight: '800', marginBottom: spacing.lg },
+  row: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.sm, paddingVertical: spacing.md },
+  me: { borderColor: colors.accent, borderWidth: 1.5 },
+  flex: { flex: 1 },
+  rank: { color: colors.text, fontSize: 20, fontWeight: '800', width: 40, textAlign: 'center' },
+  name: { color: colors.text, fontSize: 16, fontWeight: '600' },
+  level: { color: colors.textMuted, fontSize: 12, marginTop: 2 },
+  xp: { color: colors.accent, fontSize: 16, fontWeight: '800' },
+});
