@@ -1,16 +1,69 @@
-// Единая тема оформления PyQuest. Палитра построена вокруг фирменных цветов
-// Python: синий #3776AB и жёлтый #FFD43B, на тёмном фоне «редактора кода».
+// Темы оформления PyQuest. Две палитры (тёмная/светлая) вокруг фирменных цветов
+// Python: синий #3776AB и жёлтый #FFD43B.
+// Поверхности кода (редактор/визуализатор) остаются тёмными в обеих темах —
+// это привычно для разработчиков и не требует перенастройки подсветки синтаксиса.
 
-export const colors = {
+export interface Palette {
+  bg: string;
+  bgElevated: string;
+  card: string;
+  cardAlt: string;
+  border: string;
+
+  primary: string;
+  primaryLight: string;
+  accent: string;
+  accentText: string; // цвет текста на жёлтой кнопке
+  accentDark: string;
+
+  success: string;
+  successBg: string;
+  danger: string;
+  dangerBg: string;
+  warning: string;
+
+  text: string;
+  textMuted: string;
+  textDim: string;
+
+  // code-поверхности (всегда тёмные)
+  codeBg: string;
+  codeBgAlt: string;
+
+  // подсветка синтаксиса (на тёмном фоне)
+  synKeyword: string;
+  synString: string;
+  synNumber: string;
+  synComment: string;
+  synFunc: string;
+  synBuiltin: string;
+
+  highlightLine: string;
+}
+
+const syntax = {
+  codeBg: '#0A1120',
+  codeBgAlt: '#0F1A30',
+  synKeyword: '#FF7AB2',
+  synString: '#9EE493',
+  synNumber: '#FFD43B',
+  synComment: '#6B7DA3',
+  synFunc: '#7FB3FF',
+  synBuiltin: '#C792EA',
+  highlightLine: 'rgba(255,212,59,0.18)',
+};
+
+export const darkColors: Palette = {
   bg: '#0F1729',
   bgElevated: '#16213E',
   card: '#1B2540',
   cardAlt: '#222F52',
   border: '#2A3A63',
 
-  primary: '#3776AB', // python blue
+  primary: '#3776AB',
   primaryLight: '#4B8BC4',
-  accent: '#FFD43B', // python yellow
+  accent: '#FFD43B',
+  accentText: '#1A1300',
   accentDark: '#E0B200',
 
   success: '#3DD68C',
@@ -23,47 +76,53 @@ export const colors = {
   textMuted: '#9AACCB',
   textDim: '#6B7DA3',
 
-  // подсветка синтаксиса (используется и в WebView-визуализаторе)
-  synKeyword: '#FF7AB2',
-  synString: '#9EE493',
-  synNumber: '#FFD43B',
-  synComment: '#6B7DA3',
-  synFunc: '#7FB3FF',
-  synBuiltin: '#C792EA',
-
-  highlightLine: 'rgba(255,212,59,0.18)',
+  ...syntax,
 };
+
+export const lightColors: Palette = {
+  bg: '#F2F5FB',
+  bgElevated: '#FFFFFF',
+  card: '#FFFFFF',
+  cardAlt: '#EAEFF8',
+  border: '#D8E0EE',
+
+  primary: '#2F6CA0',
+  primaryLight: '#2C6291',
+  accent: '#F2B705',
+  accentText: '#1A1300',
+  accentDark: '#C99400',
+
+  success: '#1E9E63',
+  successBg: '#DDF4E8',
+  danger: '#D6453F',
+  dangerBg: '#FBE3E2',
+  warning: '#C77A1C',
+
+  text: '#142036',
+  textMuted: '#566179',
+  textDim: '#8A97AD',
+
+  ...syntax,
+};
+
+export type ThemeMode = 'dark' | 'light';
+
+// Back-compat: статическая палитра по умолчанию (тёмная).
+export const colors = darkColors;
 
 export const rarityColors: Record<string, string> = {
-  common: '#9AACCB',
+  common: '#8A97AD',
   rare: '#4B8BC4',
   epic: '#C792EA',
-  legendary: '#FFD43B',
+  legendary: '#E0B200',
 };
 
-export const spacing = {
-  xs: 4,
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
-  xxl: 32,
-};
+export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 };
+export const radius = { sm: 8, md: 12, lg: 16, xl: 24 };
+export const font = { mono: 'monospace' };
 
-export const radius = {
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 24,
-};
-
-export const font = {
-  mono: 'monospace',
-};
-
-// Сколько XP нужно для уровня. Простая прогрессия: 1 уровень = 500 XP.
+// Прогрессия: 1 уровень = 500 XP.
 export const XP_PER_LEVEL = 500;
-
 export function levelFromXp(xp: number): number {
   return Math.floor(xp / XP_PER_LEVEL) + 1;
 }

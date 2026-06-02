@@ -8,11 +8,27 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import { colors, radius, spacing } from '../theme/theme';
+import { Palette, radius, spacing } from '../theme/theme';
+import { useTheme } from '../theme/ThemeContext';
 
-export const Card: React.FC<{ children: React.ReactNode; style?: ViewStyle }> = ({ children, style }) => (
-  <View style={[styles.card, style]}>{children}</View>
-);
+export const Card: React.FC<{ children: React.ReactNode; style?: ViewStyle }> = ({ children, style }) => {
+  const { colors } = useTheme();
+  return (
+    <View
+      style={[
+        {
+          backgroundColor: colors.card,
+          borderRadius: radius.lg,
+          padding: spacing.lg,
+          borderWidth: 1,
+          borderColor: colors.border,
+        },
+        style,
+      ]}>
+      {children}
+    </View>
+  );
+};
 
 export const Button: React.FC<{
   title: string;
@@ -21,7 +37,9 @@ export const Button: React.FC<{
   disabled?: boolean;
   loading?: boolean;
   style?: ViewStyle;
-}> = ({ title, onPress, variant = 'primary', disabled, loading, style }) => {
+  icon?: React.ReactNode;
+}> = ({ title, onPress, variant = 'primary', disabled, loading, style, icon }) => {
+  const { colors } = useTheme();
   const bg = {
     primary: colors.primary,
     accent: colors.accent,
@@ -29,51 +47,75 @@ export const Button: React.FC<{
     success: colors.success,
     danger: colors.danger,
   }[variant];
-  const fg = variant === 'accent' ? '#1A1300' : variant === 'ghost' ? colors.text : '#06121F';
+  const fg = variant === 'accent' ? colors.accentText : variant === 'ghost' ? colors.text : '#06121F';
   return (
     <TouchableOpacity
       activeOpacity={0.85}
       onPress={onPress}
       disabled={disabled || loading}
       style={[
-        styles.button,
-        { backgroundColor: bg, opacity: disabled ? 0.5 : 1 },
-        variant === 'ghost' && styles.buttonGhost,
+        {
+          flexDirection: 'row',
+          paddingVertical: 14,
+          paddingHorizontal: spacing.lg,
+          borderRadius: radius.md,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: bg,
+          opacity: disabled ? 0.5 : 1,
+        },
+        variant === 'ghost' && { borderWidth: 1, borderColor: colors.border },
         style,
       ]}>
       {loading ? (
         <ActivityIndicator color={fg} />
       ) : (
-        <Text style={[styles.buttonText, { color: fg }]}>{title}</Text>
+        <>
+          {icon ? <View style={{ marginRight: 8 }}>{icon}</View> : null}
+          <Text style={{ fontSize: 16, fontWeight: '700', color: fg }}>{title}</Text>
+        </>
       )}
     </TouchableOpacity>
   );
 };
 
-export const Pill: React.FC<{ text: string; color?: string; bg?: string }> = ({ text, color, bg }) => (
-  <View style={[styles.pill, { backgroundColor: bg ?? colors.cardAlt }]}>
-    <Text style={[styles.pillText, { color: color ?? colors.textMuted }]}>{text}</Text>
-  </View>
-);
+export const Pill: React.FC<{ text: string; color?: string; bg?: string }> = ({ text, color, bg }) => {
+  const { colors } = useTheme();
+  return (
+    <View
+      style={{
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: radius.sm,
+        alignSelf: 'flex-start',
+        backgroundColor: bg ?? colors.cardAlt,
+      }}>
+      <Text style={{ fontSize: 12, fontWeight: '600', color: color ?? colors.textMuted }}>{text}</Text>
+    </View>
+  );
+};
 
 export const ProgressBar: React.FC<{ value: number; color?: string; height?: number }> = ({
   value,
-  color = colors.accent,
+  color,
   height = 8,
-}) => (
-  <View style={[styles.progressTrack, { height, borderRadius: height / 2 }]}>
-    <View
-      style={{
-        width: `${Math.max(0, Math.min(1, value)) * 100}%`,
-        height,
-        borderRadius: height / 2,
-        backgroundColor: color,
-      }}
-    />
-  </View>
-);
+}) => {
+  const { colors } = useTheme();
+  return (
+    <View style={{ backgroundColor: colors.cardAlt, overflow: 'hidden', width: '100%', height, borderRadius: height / 2 }}>
+      <View
+        style={{
+          width: `${Math.max(0, Math.min(1, value)) * 100}%`,
+          height,
+          borderRadius: height / 2,
+          backgroundColor: color ?? colors.accent,
+        }}
+      />
+    </View>
+  );
+};
 
-// ---- Лёгкая подсветка синтаксиса Python (нативная, для код-блоков) ----
+// ---- Лёгкая подсветка синтаксиса Python (нативная) ----
 const KEYWORDS = new Set([
   'def', 'return', 'if', 'elif', 'else', 'for', 'while', 'in', 'and', 'or', 'not',
   'class', 'import', 'from', 'as', 'with', 'try', 'except', 'finally', 'pass',
@@ -86,9 +128,8 @@ const BUILTINS = new Set([
 
 type Tok = { text: string; color: string };
 
-function tokenizeLine(line: string): Tok[] {
+export function tokenizeLine(line: string, c: Palette): Tok[] {
   const toks: Tok[] = [];
-  // комментарий
   const hashIdx = line.indexOf('#');
   let code = line;
   let comment = '';
@@ -96,39 +137,48 @@ function tokenizeLine(line: string): Tok[] {
     code = line.slice(0, hashIdx);
     comment = line.slice(hashIdx);
   }
-  // разбиваем по строковым литералам и токенам
   const re = /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|\b\d+\.?\d*\b|[A-Za-z_]\w*|\s+|[^\sA-Za-z_0-9])/g;
   const parts = code.match(re) || [code];
   for (const p of parts) {
-    if (/^["']/.test(p)) toks.push({ text: p, color: colors.synString });
-    else if (/^\d/.test(p)) toks.push({ text: p, color: colors.synNumber });
-    else if (KEYWORDS.has(p)) toks.push({ text: p, color: colors.synKeyword });
-    else if (BUILTINS.has(p)) toks.push({ text: p, color: colors.synBuiltin });
-    else toks.push({ text: p, color: colors.text });
+    if (/^["']/.test(p)) toks.push({ text: p, color: c.synString });
+    else if (/^\d/.test(p)) toks.push({ text: p, color: c.synNumber });
+    else if (KEYWORDS.has(p)) toks.push({ text: p, color: c.synKeyword });
+    else if (BUILTINS.has(p)) toks.push({ text: p, color: c.synBuiltin });
+    else toks.push({ text: p, color: '#EAF0FB' });
   }
-  if (comment) toks.push({ text: comment, color: colors.synComment });
+  if (comment) toks.push({ text: comment, color: c.synComment });
   return toks;
 }
 
 export const CodeBlock: React.FC<{
   code: string;
-  highlightLine?: number; // 1-based
+  highlightLine?: number;
   style?: ViewStyle;
 }> = ({ code, highlightLine, style }) => {
+  const { colors } = useTheme();
   const lines = code.replace(/\t/g, '    ').split('\n');
   return (
-    <View style={[styles.codeBlock, style]}>
+    <View
+      style={[
+        { backgroundColor: colors.codeBg, borderRadius: radius.md, paddingVertical: spacing.sm, borderWidth: 1, borderColor: colors.border },
+        style,
+      ]}>
       {lines.map((line, idx) => {
         const isHL = highlightLine === idx + 1;
         return (
           <View
             key={idx}
-            style={[styles.codeLine, isHL && { backgroundColor: colors.highlightLine }]}>
-            <Text style={styles.codeGutter}>{String(idx + 1).padStart(2, ' ')}</Text>
-            <Text style={styles.codeText}>
-              {tokenizeLine(line).map((t, i) => (
-                <Text key={i} style={{ color: t.color }}>
-                  {t.text}
+            style={[
+              { flexDirection: 'row', paddingHorizontal: spacing.sm, paddingVertical: 1 },
+              isHL && { backgroundColor: colors.highlightLine },
+            ]}>
+            <Text style={{ color: colors.textDim, fontFamily: 'monospace', fontSize: 13, width: 26, textAlign: 'right', marginRight: 10 }}>
+              {String(idx + 1).padStart(2, ' ')}
+            </Text>
+            <Text style={{ fontFamily: 'monospace', fontSize: 13, flex: 1, lineHeight: 20 }}>
+              {tokenizeLine(line, colors).map((tk, i) => (
+                <Text key={i} style={{ color: tk.color }}>
+                  {tk.text}
                 </Text>
               ))}
               {line.length === 0 ? ' ' : ''}
@@ -140,51 +190,10 @@ export const CodeBlock: React.FC<{
   );
 };
 
-export const SectionTitle: React.FC<{ children: React.ReactNode; style?: TextStyle }> = ({ children, style }) => (
-  <Text style={[styles.sectionTitle, style]}>{children}</Text>
-);
+export const SectionTitle: React.FC<{ children: React.ReactNode; style?: TextStyle }> = ({ children, style }) => {
+  const { colors } = useTheme();
+  return <Text style={[{ color: colors.text, fontSize: 18, fontWeight: '700', marginBottom: spacing.sm }, style]}>{children}</Text>;
+};
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.card,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  button: {
-    paddingVertical: 14,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonGhost: { borderWidth: 1, borderColor: colors.border },
-  buttonText: { fontSize: 16, fontWeight: '700' },
-  pill: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: radius.sm,
-    alignSelf: 'flex-start',
-  },
-  pillText: { fontSize: 12, fontWeight: '600' },
-  progressTrack: { backgroundColor: colors.cardAlt, overflow: 'hidden', width: '100%' },
-  codeBlock: {
-    backgroundColor: '#0A1120',
-    borderRadius: radius.md,
-    paddingVertical: spacing.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  codeLine: { flexDirection: 'row', paddingHorizontal: spacing.sm, paddingVertical: 1 },
-  codeGutter: {
-    color: colors.textDim,
-    fontFamily: 'monospace',
-    fontSize: 13,
-    width: 26,
-    textAlign: 'right',
-    marginRight: 10,
-  },
-  codeText: { fontFamily: 'monospace', fontSize: 13, flex: 1, lineHeight: 20 },
-  sectionTitle: { color: colors.text, fontSize: 18, fontWeight: '700', marginBottom: spacing.sm },
-});
+// заглушка (стили теперь инлайновые/темовые)
+export const _styles = StyleSheet.create({});

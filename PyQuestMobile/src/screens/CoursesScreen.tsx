@@ -2,7 +2,8 @@ import React, { useCallback, useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { colors, radius, spacing } from '../theme/theme';
+import { Palette, radius, spacing } from '../theme/theme';
+import { useTheme, useThemedStyles } from '../theme/ThemeContext';
 import { Card, Pill, ProgressBar } from '../components/UI';
 import { CoursesStackParamList } from '../navigation/types';
 import { Course } from '../types';
@@ -17,6 +18,8 @@ const DIFF_LABEL: Record<string, string> = { easy: 'Лёгкий', medium: 'Ср
 export const CoursesScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
   const { user } = useApp();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [courses, setCourses] = useState<Course[]>([]);
   const [progressByCourse, setProgressByCourse] = useState<Record<string, number>>({});
 
@@ -24,10 +27,10 @@ export const CoursesScreen: React.FC = () => {
     const [cs, allProgress] = await Promise.all([api.getCourses(), api.getAllProgress()]);
     setCourses(cs);
     const map: Record<string, number> = {};
-    for (const c of cs) {
-      const lessons = lessonsByCourse(c.id);
+    for (const cc of cs) {
+      const lessons = lessonsByCourse(cc.id);
       const done = lessons.filter((l) => allProgress[l.id]?.status === 'completed').length;
-      map[c.id] = lessons.length ? done / lessons.length : 0;
+      map[cc.id] = lessons.length ? done / lessons.length : 0;
     }
     setProgressByCourse(map);
   }, []);
@@ -74,7 +77,7 @@ export const CoursesScreen: React.FC = () => {
     <View style={styles.container}>
       <FlatList
         data={courses}
-        keyExtractor={(c) => c.id}
+        keyExtractor={(cc) => cc.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
         ListHeaderComponent={
@@ -89,27 +92,21 @@ export const CoursesScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bg },
-  list: { padding: spacing.lg, paddingBottom: spacing.xxl },
-  header: { marginBottom: spacing.lg },
-  greeting: { color: colors.text, fontSize: 24, fontWeight: '800' },
-  headerSub: { color: colors.textMuted, fontSize: 14, marginTop: 4 },
-  card: { marginBottom: spacing.md },
-  row: { flexDirection: 'row' },
-  flex: { flex: 1 },
-  emojiBox: {
-    width: 56,
-    height: 56,
-    borderRadius: radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: spacing.md,
-  },
-  emoji: { fontSize: 30 },
-  title: { color: colors.text, fontSize: 17, fontWeight: '700' },
-  desc: { color: colors.textMuted, fontSize: 13, marginTop: 2 },
-  metaRow: { flexDirection: 'row', gap: 8, marginTop: spacing.sm },
-  progressRow: { flexDirection: 'row', alignItems: 'center', marginTop: spacing.md, gap: spacing.md },
-  progressText: { color: colors.textMuted, fontSize: 12, width: 38, textAlign: 'right' },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: c.bg },
+    list: { padding: spacing.lg, paddingBottom: spacing.xxl },
+    header: { marginBottom: spacing.lg },
+    greeting: { color: c.text, fontSize: 24, fontWeight: '800' },
+    headerSub: { color: c.textMuted, fontSize: 14, marginTop: 4 },
+    card: { marginBottom: spacing.md },
+    row: { flexDirection: 'row' },
+    flex: { flex: 1 },
+    emojiBox: { width: 56, height: 56, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', marginRight: spacing.md },
+    emoji: { fontSize: 30 },
+    title: { color: c.text, fontSize: 17, fontWeight: '700' },
+    desc: { color: c.textMuted, fontSize: 13, marginTop: 2 },
+    metaRow: { flexDirection: 'row', gap: 8, marginTop: spacing.sm },
+    progressRow: { flexDirection: 'row', alignItems: 'center', marginTop: spacing.md, gap: spacing.md },
+    progressText: { color: c.textMuted, fontSize: 12, width: 38, textAlign: 'right' },
+  });

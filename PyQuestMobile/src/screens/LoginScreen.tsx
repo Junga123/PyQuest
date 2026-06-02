@@ -10,13 +10,16 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { colors, radius, spacing } from '../theme/theme';
+import { Palette, radius, spacing } from '../theme/theme';
+import { useTheme, useThemedStyles } from '../theme/ThemeContext';
 import { Button } from '../components/UI';
 import { useApp } from '../context/AppContext';
 import { LOGO_DATA_URI } from '../data/images';
 
 export const LoginScreen: React.FC = () => {
   const { login, register, loginDemo } = useApp();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -53,25 +56,15 @@ export const LoginScreen: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <Image source={{ uri: LOGO_DATA_URI }} style={styles.logo} />
         <Text style={styles.title}>PyQuest</Text>
-        <Text style={styles.subtitle}>
-          {mode === 'login' ? 'Вход в аккаунт' : 'Регистрация'}
-        </Text>
+        <Text style={styles.subtitle}>{mode === 'login' ? 'Вход в аккаунт' : 'Регистрация'}</Text>
 
         <View style={styles.form}>
           {mode === 'register' && (
-            <TextInput
-              style={styles.input}
-              placeholder="Имя"
-              placeholderTextColor={colors.textDim}
-              value={name}
-              onChangeText={setName}
-            />
+            <TextInput style={styles.input} placeholder="Имя" placeholderTextColor={colors.textDim} value={name} onChangeText={setName} />
           )}
           <TextInput
             style={styles.input}
@@ -110,8 +103,27 @@ export const LoginScreen: React.FC = () => {
             </Text>
           </TouchableOpacity>
 
-          <View style={styles.divider} />
-          <Button title="Войти как гость (демо)" variant="ghost" onPress={demo} />
+          <View style={styles.dividerRow}>
+            <View style={styles.divider} />
+            <Text style={styles.dividerText}>или</Text>
+            <View style={styles.divider} />
+          </View>
+
+          {/* Соц-вход (мок: бэкенд замокан, OAuth не настраивается для демо) */}
+          <TouchableOpacity style={styles.social} onPress={demo} activeOpacity={0.85}>
+            <View style={[styles.socialBadge, { backgroundColor: '#fff' }]}>
+              <Text style={[styles.socialG, { color: '#4285F4' }]}>G</Text>
+            </View>
+            <Text style={styles.socialText}>Продолжить с Google</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.social} onPress={demo} activeOpacity={0.85}>
+            <View style={[styles.socialBadge, { backgroundColor: '#000' }]}>
+              <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff' }} />
+            </View>
+            <Text style={styles.socialText}>Продолжить с Apple</Text>
+          </TouchableOpacity>
+
+          <Button title="Войти как гость (демо)" variant="ghost" onPress={demo} style={{ marginTop: spacing.md }} />
         </View>
 
         <View style={styles.footer}>
@@ -122,27 +134,43 @@ export const LoginScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: colors.bg },
-  container: { flexGrow: 1, padding: spacing.xl, justifyContent: 'center', alignItems: 'center' },
-  logo: { width: 84, height: 84, borderRadius: 20 },
-  title: { color: colors.text, fontSize: 30, fontWeight: '900', marginTop: spacing.md },
-  subtitle: { color: colors.textMuted, fontSize: 15, marginTop: spacing.xs, marginBottom: spacing.xl },
-  form: { width: '100%', maxWidth: 420 },
-  input: {
-    backgroundColor: colors.card,
-    borderColor: colors.border,
-    borderWidth: 1,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: 14,
-    color: colors.text,
-    fontSize: 16,
-    marginBottom: spacing.md,
-  },
-  error: { color: colors.danger, fontSize: 14, marginBottom: spacing.sm },
-  switch: { color: colors.primaryLight, textAlign: 'center', marginTop: spacing.lg, fontSize: 14 },
-  divider: { height: 1, backgroundColor: colors.border, marginVertical: spacing.lg },
-  footer: { marginTop: spacing.xxl },
-  author: { color: colors.textDim, fontSize: 12, textAlign: 'center' },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    flex: { flex: 1, backgroundColor: c.bg },
+    container: { flexGrow: 1, padding: spacing.xl, justifyContent: 'center', alignItems: 'center' },
+    logo: { width: 84, height: 84, borderRadius: 20 },
+    title: { color: c.text, fontSize: 30, fontWeight: '900', marginTop: spacing.md },
+    subtitle: { color: c.textMuted, fontSize: 15, marginTop: spacing.xs, marginBottom: spacing.xl },
+    form: { width: '100%', maxWidth: 420 },
+    input: {
+      backgroundColor: c.card,
+      borderColor: c.border,
+      borderWidth: 1,
+      borderRadius: radius.md,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: 14,
+      color: c.text,
+      fontSize: 16,
+      marginBottom: spacing.md,
+    },
+    error: { color: c.danger, fontSize: 14, marginBottom: spacing.sm },
+    switch: { color: c.primaryLight, textAlign: 'center', marginTop: spacing.lg, fontSize: 14 },
+    dividerRow: { flexDirection: 'row', alignItems: 'center', marginVertical: spacing.lg },
+    divider: { flex: 1, height: 1, backgroundColor: c.border },
+    dividerText: { color: c.textDim, marginHorizontal: spacing.md, fontSize: 13 },
+    social: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: c.card,
+      borderColor: c.border,
+      borderWidth: 1,
+      borderRadius: radius.md,
+      padding: 12,
+      marginBottom: spacing.sm,
+    },
+    socialBadge: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginRight: spacing.md },
+    socialG: { fontSize: 16, fontWeight: '900' },
+    socialText: { color: c.text, fontSize: 15, fontWeight: '600' },
+    footer: { marginTop: spacing.xxl },
+    author: { color: c.textDim, fontSize: 12, textAlign: 'center' },
+  });

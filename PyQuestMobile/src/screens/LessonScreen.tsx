@@ -1,24 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { colors, radius, spacing } from '../theme/theme';
+import { Palette, radius, spacing } from '../theme/theme';
+import { useTheme, useThemedStyles } from '../theme/ThemeContext';
 import { Button, Card, CodeBlock, Pill } from '../components/UI';
+import { CodeEditor } from '../components/CodeEditor';
+import { Icon } from '../components/Icon';
 import { CoursesStackParamList } from '../navigation/types';
-import {
-  CodeValidation,
-  FillGapValidation,
-  Lesson,
-  MultipleChoiceValidation,
-  Task,
-} from '../types';
+import { CodeValidation, FillGapValidation, Lesson, MultipleChoiceValidation, Task } from '../types';
 import * as api from '../api/mockApi';
 import { findLesson, tasksByLesson } from '../data/courses';
 import { getTrace } from '../data/traces';
@@ -32,6 +22,7 @@ export const LessonScreen: React.FC = () => {
   const route = useRoute<Rt>();
   const { lessonId } = route.params;
   const { refresh } = useApp();
+  const styles = useThemedStyles(makeStyles);
 
   const lesson = useMemo<Lesson | undefined>(() => findLesson(lessonId), [lessonId]);
   const tasks = useMemo<Task[]>(() => tasksByLesson(lessonId), [lessonId]);
@@ -68,7 +59,7 @@ export const LessonScreen: React.FC = () => {
   if (phase === 'theory') {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <Pill text="Теория" color={colors.primaryLight} bg={colors.primary + '22'} />
+        <Pill text="Теория" color={styles._accent.color} bg={styles._accentBg.backgroundColor} />
         <Text style={styles.h1}>{lesson.title}</Text>
         <Text style={styles.lead}>{lesson.content.description}</Text>
 
@@ -88,11 +79,7 @@ export const LessonScreen: React.FC = () => {
           );
         })}
 
-        <Button
-          title={`Перейти к заданиям (${tasks.length})`}
-          onPress={() => setPhase('tasks')}
-          style={{ marginTop: spacing.xl }}
-        />
+        <Button title={`Перейти к заданиям (${tasks.length})`} onPress={() => setPhase('tasks')} style={{ marginTop: spacing.xl }} />
       </ScrollView>
     );
   }
@@ -104,7 +91,7 @@ export const LessonScreen: React.FC = () => {
         <Text style={styles.h1}>Урок пройден!</Text>
         <Text style={styles.lead}>Вы заработали в этой сессии</Text>
         <Text style={styles.xpBig}>+{earned} XP</Text>
-        <Button title="Вернуться к курсу" onPress={() => navigation.goBack()} style={{ marginTop: spacing.xl, alignSelf: 'stretch' }} />
+        <Button title="Вернуться к карте" onPress={() => navigation.goBack()} style={{ marginTop: spacing.xl, alignSelf: 'stretch' }} />
       </View>
     );
   }
@@ -116,40 +103,36 @@ export const LessonScreen: React.FC = () => {
         <Text style={styles.muted}>
           Задание {index + 1} из {tasks.length}
         </Text>
-        <Pill text={`+${task.xp_reward} XP`} color={colors.accent} bg={colors.accent + '1A'} />
+        <Pill text={`+${task.xp_reward} XP`} color={styles._accent.color} bg={styles._accentBg.backgroundColor} />
       </View>
       <TaskView
         key={task.id}
         task={task}
         onSolved={onTaskSolved}
         onNext={next}
-        onVisualize={(traceId, title) =>
-          navigation.navigate('CodeVisualizer', { traceId, title, task })
-        }
+        onVisualize={(traceId, title) => navigation.navigate('CodeVisualizer', { traceId, title, task })}
       />
     </ScrollView>
   );
 };
 
-// ===================== Один таск (4 типа) =====================
 const TaskView: React.FC<{
   task: Task;
   onSolved: (xp: number) => void;
   onNext: () => void;
   onVisualize: (traceId?: string, title?: string) => void;
 }> = ({ task, onSolved, onNext, onVisualize }) => {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [solved, setSolved] = useState(false);
   const [feedback, setFeedback] = useState<{ ok: boolean; text: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [showHint, setShowHint] = useState(false);
 
-  // ввод по типам
   const [choice, setChoice] = useState<number | null>(null);
   const [gap, setGap] = useState('');
   const codeStart =
-    task.task_type === 'write_code' || task.task_type === 'debug_code'
-      ? (task.validation as CodeValidation).starterCode || ''
-      : '';
+    task.task_type === 'write_code' || task.task_type === 'debug_code' ? (task.validation as CodeValidation).starterCode || '' : '';
   const [code, setCode] = useState(codeStart);
 
   const submit = async () => {
@@ -183,11 +166,10 @@ const TaskView: React.FC<{
 
   return (
     <Card>
-      <Pill text={TASK_TYPE_LABEL[task.task_type]} color={colors.primaryLight} bg={colors.primary + '22'} />
+      <Pill text={TASK_TYPE_LABEL[task.task_type]} color={styles._accent.color} bg={styles._primaryBg.backgroundColor} />
       <Text style={styles.taskTitle}>{task.title}</Text>
       <Text style={styles.prompt}>{task.prompt}</Text>
 
-      {/* MULTIPLE CHOICE */}
       {task.task_type === 'multiple_choice' && (
         <View style={{ marginTop: spacing.md }}>
           {(task.validation as MultipleChoiceValidation).options.map((opt, i) => {
@@ -203,9 +185,7 @@ const TaskView: React.FC<{
                 activeOpacity={0.8}
                 onPress={() => setChoice(i)}
                 style={[styles.option, { backgroundColor: bg, borderColor: border }]}>
-                <View style={[styles.radio, selected && { borderColor: colors.primary }]}>
-                  {selected && <View style={styles.radioDot} />}
-                </View>
+                <View style={[styles.radio, selected && { borderColor: colors.primary }]}>{selected && <View style={styles.radioDot} />}</View>
                 <Text style={styles.optionText}>{opt}</Text>
               </TouchableOpacity>
             );
@@ -213,14 +193,13 @@ const TaskView: React.FC<{
         </View>
       )}
 
-      {/* FILL GAP */}
       {task.task_type === 'fill_gap' && (
         <View style={{ marginTop: spacing.md }}>
           {!!(task.validation as FillGapValidation).template && (
             <CodeBlock code={(task.validation as FillGapValidation).template!.replace(/___/g, '▢▢▢')} />
           )}
           <TextInput
-            style={styles.codeInput}
+            style={styles.gapInput}
             placeholder="Ваш ответ"
             placeholderTextColor={colors.textDim}
             autoCapitalize="none"
@@ -232,27 +211,12 @@ const TaskView: React.FC<{
         </View>
       )}
 
-      {/* CODE */}
       {isCode && (
         <View style={{ marginTop: spacing.md }}>
           <Text style={styles.editorLabel}>Редактор кода (Python):</Text>
-          <TextInput
-            style={styles.editor}
-            multiline
-            autoCapitalize="none"
-            autoCorrect={false}
-            spellCheck={false}
-            value={code}
-            onChangeText={setCode}
-            editable={!solved}
-          />
+          <CodeEditor value={code} onChangeText={setCode} editable={!solved} />
           <View style={styles.codeButtons}>
-            <Button
-              title="👁 Визуализировать"
-              variant="ghost"
-              onPress={() => onVisualize(traceId, task.title)}
-              style={{ flex: 1 }}
-            />
+            <Button title="Визуализировать" variant="ghost" icon={<Icon name="eye" size={18} color={colors.text} />} onPress={() => onVisualize(traceId, task.title)} style={{ flex: 1 }} />
             {!solved && (
               <Button
                 title="Решение"
@@ -268,7 +232,6 @@ const TaskView: React.FC<{
         </View>
       )}
 
-      {/* HINT */}
       {!!task.hint && (
         <TouchableOpacity onPress={() => setShowHint((s) => !s)} style={{ marginTop: spacing.md }}>
           <Text style={styles.hintToggle}>{showHint ? '▼' : '▶'} Подсказка</Text>
@@ -276,7 +239,6 @@ const TaskView: React.FC<{
       )}
       {showHint && !!task.hint && <Text style={styles.hint}>{task.hint}</Text>}
 
-      {/* FEEDBACK */}
       {!!feedback && (
         <View style={[styles.feedback, { backgroundColor: feedback.ok ? colors.successBg : colors.dangerBg }]}>
           <Text style={[styles.feedbackText, { color: feedback.ok ? colors.success : colors.danger }]}>
@@ -286,7 +248,6 @@ const TaskView: React.FC<{
         </View>
       )}
 
-      {/* ACTIONS */}
       {!solved ? (
         <Button
           title="Проверить"
@@ -302,7 +263,6 @@ const TaskView: React.FC<{
   );
 };
 
-// Убирает из «эталонного» кода визуализации вызовы print/тестов — оставляет решение.
 function stripHarness(code: string): string {
   return code
     .split('\n')
@@ -319,31 +279,35 @@ const TASK_TYPE_LABEL: Record<string, string> = {
   debug_code: 'Найди ошибку',
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bg },
-  content: { padding: spacing.lg, paddingBottom: spacing.xxl },
-  center: { flex: 1, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center', padding: spacing.xl },
-  h1: { color: colors.text, fontSize: 24, fontWeight: '800', marginTop: spacing.sm },
-  lead: { color: colors.textMuted, fontSize: 15, marginTop: spacing.sm, lineHeight: 22 },
-  paragraph: { color: colors.text, fontSize: 15, lineHeight: 23, marginTop: spacing.md },
-  note: { backgroundColor: colors.primary + '1A', borderRadius: radius.md, padding: spacing.md, marginTop: spacing.md, borderLeftWidth: 3, borderLeftColor: colors.primary },
-  noteText: { color: colors.text, fontSize: 14, lineHeight: 21 },
-  progressHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.md },
-  muted: { color: colors.textMuted, fontSize: 14 },
-  taskTitle: { color: colors.text, fontSize: 19, fontWeight: '700', marginTop: spacing.sm },
-  prompt: { color: colors.text, fontSize: 15, marginTop: spacing.sm, lineHeight: 22 },
-  option: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.sm },
-  radio: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: colors.textDim, marginRight: spacing.md, alignItems: 'center', justifyContent: 'center' },
-  radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.primary },
-  optionText: { color: colors.text, fontSize: 15, flex: 1 },
-  codeInput: { backgroundColor: '#0A1120', borderColor: colors.border, borderWidth: 1, borderRadius: radius.md, padding: spacing.md, color: colors.text, fontFamily: 'monospace', fontSize: 15, marginTop: spacing.md },
-  editorLabel: { color: colors.textMuted, fontSize: 13, marginBottom: spacing.sm },
-  editor: { backgroundColor: '#0A1120', borderColor: colors.border, borderWidth: 1, borderRadius: radius.md, padding: spacing.md, color: colors.text, fontFamily: 'monospace', fontSize: 14, minHeight: 140, textAlignVertical: 'top', lineHeight: 21 },
-  codeButtons: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm },
-  hintToggle: { color: colors.accent, fontSize: 14, fontWeight: '600' },
-  hint: { color: colors.textMuted, fontSize: 14, marginTop: spacing.sm, fontStyle: 'italic', lineHeight: 21 },
-  feedback: { borderRadius: radius.md, padding: spacing.md, marginTop: spacing.lg },
-  feedbackText: { fontSize: 14, fontWeight: '600', lineHeight: 20 },
-  bigEmoji: { fontSize: 64, marginBottom: spacing.md },
-  xpBig: { color: colors.accent, fontSize: 40, fontWeight: '900', marginTop: spacing.sm },
-});
+const makeStyles = (c: Palette) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: c.bg },
+    content: { padding: spacing.lg, paddingBottom: spacing.xxl },
+    center: { flex: 1, backgroundColor: c.bg, alignItems: 'center', justifyContent: 'center', padding: spacing.xl },
+    h1: { color: c.text, fontSize: 24, fontWeight: '800', marginTop: spacing.sm },
+    lead: { color: c.textMuted, fontSize: 15, marginTop: spacing.sm, lineHeight: 22 },
+    paragraph: { color: c.text, fontSize: 15, lineHeight: 23, marginTop: spacing.md },
+    note: { backgroundColor: c.primary + '1A', borderRadius: radius.md, padding: spacing.md, marginTop: spacing.md, borderLeftWidth: 3, borderLeftColor: c.primary },
+    noteText: { color: c.text, fontSize: 14, lineHeight: 21 },
+    progressHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.md },
+    muted: { color: c.textMuted, fontSize: 14 },
+    taskTitle: { color: c.text, fontSize: 19, fontWeight: '700', marginTop: spacing.sm },
+    prompt: { color: c.text, fontSize: 15, marginTop: spacing.sm, lineHeight: 22 },
+    option: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.sm },
+    radio: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, borderColor: c.textDim, marginRight: spacing.md, alignItems: 'center', justifyContent: 'center' },
+    radioDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: c.primary },
+    optionText: { color: c.text, fontSize: 15, flex: 1 },
+    gapInput: { backgroundColor: c.codeBg, borderColor: c.border, borderWidth: 1, borderRadius: radius.md, padding: spacing.md, color: c.text, fontFamily: 'monospace', fontSize: 15, marginTop: spacing.md },
+    editorLabel: { color: c.textMuted, fontSize: 13, marginBottom: spacing.sm },
+    codeButtons: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm },
+    hintToggle: { color: c.accent, fontSize: 14, fontWeight: '600' },
+    hint: { color: c.textMuted, fontSize: 14, marginTop: spacing.sm, fontStyle: 'italic', lineHeight: 21 },
+    feedback: { borderRadius: radius.md, padding: spacing.md, marginTop: spacing.lg },
+    feedbackText: { fontSize: 14, fontWeight: '600', lineHeight: 20 },
+    bigEmoji: { fontSize: 64, marginBottom: spacing.md },
+    xpBig: { color: c.accent, fontSize: 40, fontWeight: '900', marginTop: spacing.sm },
+    // вспомогательные «цветовые» стили для Pill
+    _accent: { color: c.primaryLight },
+    _accentBg: { backgroundColor: c.primary + '22' },
+    _primaryBg: { backgroundColor: c.primary + '22' },
+  });

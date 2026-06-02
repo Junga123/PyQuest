@@ -7,9 +7,14 @@ import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { AppProvider, useApp } from './src/context/AppContext';
+import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { LoadingScreen } from './src/screens/LoadingScreen';
-import { colors } from './src/theme/theme';
+
+const ThemedStatusBar: React.FC = () => {
+  const { mode, colors } = useTheme();
+  return <StatusBar barStyle={mode === 'dark' ? 'light-content' : 'dark-content'} backgroundColor={colors.bg} />;
+};
 
 const Gate: React.FC = () => {
   const { ready } = useApp();
@@ -19,12 +24,14 @@ const Gate: React.FC = () => {
 
 const App: React.FC = () => (
   <ErrorBoundary>
-    <SafeAreaProvider>
-      <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
-      <AppProvider>
-        <Gate />
-      </AppProvider>
-    </SafeAreaProvider>
+    <ThemeProvider>
+      <SafeAreaProvider>
+        <ThemedStatusBar />
+        <AppProvider>
+          <Gate />
+        </AppProvider>
+      </SafeAreaProvider>
+    </ThemeProvider>
   </ErrorBoundary>
 );
 

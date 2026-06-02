@@ -7,6 +7,11 @@ export type CoursesStackParamList = {
   CodeVisualizer: { traceId?: string; title?: string; task?: Task };
 };
 
+export type ProfileStackParamList = {
+  Profile: undefined;
+  Settings: undefined;
+};
+
 export type MainTabParamList = {
   CoursesTab: undefined;
   LeaderboardTab: undefined;
