@@ -7,6 +7,7 @@ const FAKE_USERS: { displayName: string; totalXp: number }[] = [
   { displayName: 'Шамиль В.', totalXp: 4780 },
   { displayName: 'Айбулат Н.', totalXp: 4310 },
   { displayName: 'Аббас А.', totalXp: 3900 },
+  { displayName: 'Вадим Г.', totalXp: 3560 },
   { displayName: 'Дмитрий К.', totalXp: 3120 },
   { displayName: 'Мария В.', totalXp: 2640 },
   { displayName: 'Иван Л.', totalXp: 1990 },

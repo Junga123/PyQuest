@@ -131,8 +131,8 @@ const makeStyles = (c: Palette) =>
     subtitle: { color: c.textMuted, fontSize: 15, marginTop: spacing.xs, marginBottom: spacing.xl },
     form: { width: '100%', maxWidth: 420 },
     input: {
-      backgroundColor: c.card,
-      borderColor: c.border,
+      backgroundColor: c.glass,
+      borderColor: c.glassBorder,
       borderWidth: 1,
       borderRadius: radius.md,
       paddingHorizontal: spacing.lg,
