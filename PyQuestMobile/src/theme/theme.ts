@@ -82,10 +82,10 @@ export const darkColors: Palette = {
   textMuted: '#9AACCB',
   textDim: '#6B7DA3',
 
-  glass: 'rgba(31,42,71,0.55)',
-  glassStrong: 'rgba(13,19,37,0.82)',
-  glassBorder: 'rgba(255,255,255,0.18)',
-  glassHi: 'rgba(255,255,255,0.40)',
+  glass: 'rgba(27,37,64,0.92)',
+  glassStrong: 'rgba(18,26,46,0.97)',
+  glassBorder: 'rgba(255,255,255,0.08)',
+  glassHi: 'rgba(255,255,255,0.10)',
 
   ...syntax,
 };
@@ -113,10 +113,10 @@ export const lightColors: Palette = {
   textMuted: '#566179',
   textDim: '#8A97AD',
 
-  glass: 'rgba(255,255,255,0.66)',
-  glassStrong: 'rgba(255,255,255,0.85)',
-  glassBorder: 'rgba(255,255,255,0.9)',
-  glassHi: 'rgba(255,255,255,1)',
+  glass: 'rgba(255,255,255,0.92)',
+  glassStrong: 'rgba(255,255,255,0.97)',
+  glassBorder: 'rgba(20,32,54,0.10)',
+  glassHi: 'rgba(255,255,255,0.6)',
 
   ...syntax,
 };
